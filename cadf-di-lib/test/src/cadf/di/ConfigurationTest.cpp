@@ -10,8 +10,8 @@
 BOOST_AUTO_TEST_SUITE(Configuration_Test_Suite)
 
     BOOST_AUTO_TEST_CASE(Configuration_No_Resources_Required) {
-        camb::di::BeanManager manager;
-        camb::di::ConfigurationWrapper<NoResourceTestConfig> wrapper(&manager);
+        cadf::di::BeanManager manager;
+        cadf::di::ConfigurationWrapper<NoResourceTestConfig> wrapper(&manager);
         BOOST_CHECK(wrapper.areResourcesSatisfied());
 
         NoResourceTestConfig *config = (NoResourceTestConfig*) wrapper.buildConfig();
@@ -24,20 +24,20 @@ BOOST_AUTO_TEST_SUITE(Configuration_Test_Suite)
     }
 
     BOOST_AUTO_TEST_CASE(Configuration_Without_Required_Resources) {
-        camb::di::BeanManager manager;
-        camb::di::ConfigurationWrapper<MissingResourcesTestConfig> wrapper(&manager);
+        cadf::di::BeanManager manager;
+        cadf::di::ConfigurationWrapper<MissingResourcesTestConfig> wrapper(&manager);
         BOOST_CHECK(!wrapper.areResourcesSatisfied());
-        BOOST_REQUIRE_THROW(wrapper.buildConfig(), camb::di::ConfigurationMissingResourcesException);
+        BOOST_REQUIRE_THROW(wrapper.buildConfig(), cadf::di::ConfigurationMissingResourcesException);
     }
 
     BOOST_AUTO_TEST_CASE(Provider_and_Consumer) {
-        camb::di::BeanManager manager;
+        cadf::di::BeanManager manager;
         // The Consumer config cannot be initialized
-        camb::di::ConfigurationWrapper<ConsumerTestConfig> consumerWrapper(&manager);
+        cadf::di::ConfigurationWrapper<ConsumerTestConfig> consumerWrapper(&manager);
         BOOST_CHECK(!consumerWrapper.areResourcesSatisfied());
 
         // The provider can be initialized
-        camb::di::ConfigurationWrapper<ProviderTestConfig> providerWrapper(&manager);
+        cadf::di::ConfigurationWrapper<ProviderTestConfig> providerWrapper(&manager);
         BOOST_CHECK(providerWrapper.areResourcesSatisfied());
         ProviderTestConfig *provider = (ProviderTestConfig*) providerWrapper.buildConfig();
         provider->initialize();

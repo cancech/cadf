@@ -5,7 +5,7 @@
 #include <vector>
 #include <iostream>
 
-namespace camb::di {
+namespace cadf::di {
 
     class ConfigurationWrapperInterface;
 

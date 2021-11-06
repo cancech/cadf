@@ -1,7 +1,7 @@
 #ifndef CONFIG_CONTEXTTESTBEANMISMATCHCONFIGS_H_
 #define CONFIG_CONTEXTTESTBEANMISMATCHCONFIGS_H_
 
-#include "camb/di/Configuration.h"
+#include "cadf/di/Configuration.h"
 #include "DummyClass.h"
 
 // Provider config which provides a single DummyClass instance

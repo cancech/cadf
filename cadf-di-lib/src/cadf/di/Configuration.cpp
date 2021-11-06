@@ -1,6 +1,6 @@
-#include "camb/di/Configuration.h"
+#include "cadf/di/Configuration.h"
 
-namespace camb::di {
+namespace cadf::di {
 
 // CTOR
     BaseConfiguration::BaseConfiguration(BeanManager *manager) : m_beanManager(manager) {

@@ -1,9 +1,10 @@
+#include "cadf/di/CircularDependencyChecker.h"
+
 #include <iostream>
 #include <algorithm>
 
-#include "camb/di/CircularDependencyChecker.h"
 
-namespace camb::di {
+namespace cadf::di {
 
     /*
      * Add the configuration

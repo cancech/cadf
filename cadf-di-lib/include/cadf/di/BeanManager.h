@@ -7,10 +7,10 @@
 #include <algorithm>
 #include <typeinfo>
 
-#include "camb/di/BeanProvider.h"
-#include "camb/di/exception/InvalidBeanException.h"
+#include "cadf/di/BeanProvider.h"
+#include "cadf/di/exception/InvalidBeanException.h"
 
-namespace camb::di {
+namespace cadf::di {
 
     /*
      * Manager responsible for tracking all bean providers, and retrieving the beans from when

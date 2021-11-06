@@ -1,3 +1,4 @@
+
 #define BOOST_TEST_DYN_LINK
 #ifdef STAND_ALONE
 #   define BOOST_TEST_MODULE Main
@@ -5,12 +6,12 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/any.hpp>
 
-#include "camb/di/BeanManager.h"
+#include "cadf/di/BeanManager.h"
 #include "DummyClass.h"
 
 struct BeanManagerTestCreator {
-        camb::di::ValueWrapper<DummyClass>* create() {
-            return new camb::di::ValueWrapper<DummyClass>(135);
+        cadf::di::ValueWrapper<DummyClass>* create() {
+            return new cadf::di::ValueWrapper<DummyClass>(135);
         }
 };
 
@@ -18,7 +19,7 @@ struct BeanManagerTestCreator {
 class A_depends_on_B;
 class B_depends_on_A;
 
-camb::di::BeanManager sharedManager;
+cadf::di::BeanManager sharedManager;
 
 class A_depends_on_B {
         B_depends_on_A *b = sharedManager.getBean<B_depends_on_A*>("B_depends_on_A");
@@ -31,12 +32,12 @@ class B_depends_on_A {
 BOOST_AUTO_TEST_SUITE(BeanManager_Test_Suite)
 
     BOOST_AUTO_TEST_CASE(Register_bean_with_no_name) {
-        camb::di::BeanManager manager;
-        BOOST_REQUIRE_THROW(manager.registerBean<int&>(""), camb::di::InvalidBeanNameException);
+        cadf::di::BeanManager manager;
+        BOOST_REQUIRE_THROW(manager.registerBean<int&>(""), cadf::di::InvalidBeanNameException);
     }
 
     BOOST_AUTO_TEST_CASE(Register_singleton_reference) {
-        camb::di::BeanManager manager;
+        cadf::di::BeanManager manager;
         manager.registerBean<DummyClass&>("singleton_reference");
 
         DummyClass &bean1 = manager.getBean<DummyClass&>("singleton_reference");
@@ -46,7 +47,7 @@ BOOST_AUTO_TEST_SUITE(BeanManager_Test_Suite)
     }
 
     BOOST_AUTO_TEST_CASE(Register_singleton_pointer) {
-        camb::di::BeanManager manager;
+        cadf::di::BeanManager manager;
         manager.registerBean<DummyClass*>("singleton_pointer");
 
         DummyClass *bean1 = manager.getBean<DummyClass*>("singleton_pointer");
@@ -57,8 +58,8 @@ BOOST_AUTO_TEST_SUITE(BeanManager_Test_Suite)
     }
 
     BOOST_AUTO_TEST_CASE(Register_factory_scalar) {
-        camb::di::BeanManager manager;
-        manager.registerBean<DummyClass, camb::di::FactoryBeanCreator<DummyClass>>("factory_scalar");
+        cadf::di::BeanManager manager;
+        manager.registerBean<DummyClass, cadf::di::FactoryBeanCreator<DummyClass>>("factory_scalar");
 
         DummyClass bean1 = manager.getBean<DummyClass>("factory_scalar");
         DummyClass bean2 = manager.getBean<DummyClass>("factory_scalar");
@@ -67,8 +68,8 @@ BOOST_AUTO_TEST_SUITE(BeanManager_Test_Suite)
     }
 
     BOOST_AUTO_TEST_CASE(Register_factory_pointer) {
-        camb::di::BeanManager manager;
-        manager.registerBean<DummyClass*, camb::di::FactoryBeanCreator<DummyClass*>>("factory_pointer");
+        cadf::di::BeanManager manager;
+        manager.registerBean<DummyClass*, cadf::di::FactoryBeanCreator<DummyClass*>>("factory_pointer");
 
         DummyClass *bean1 = manager.getBean<DummyClass*>("factory_pointer");
         DummyClass *bean2 = manager.getBean<DummyClass*>("factory_pointer");
@@ -81,13 +82,13 @@ BOOST_AUTO_TEST_SUITE(BeanManager_Test_Suite)
     }
 
     BOOST_AUTO_TEST_CASE(Register_multiples_of_same_bean) {
-        camb::di::BeanManager manager;
+        cadf::di::BeanManager manager;
         manager.registerBean<DummyClass, BeanManagerTestCreator>("multiple_of_same_bean");
         // Verify that the original bean was actually added
         DummyClass bean = manager.getBean<DummyClass>("multiple_of_same_bean");
         BOOST_CHECK_EQUAL(135, bean.getValue());
 
-        BOOST_REQUIRE_THROW(manager.registerBean<int*>("multiple_of_same_bean"), camb::di::InvalidBeanNameException);
+        BOOST_REQUIRE_THROW(manager.registerBean<int*>("multiple_of_same_bean"), cadf::di::InvalidBeanNameException);
 
         // Verify that the original bean is still there
         DummyClass bean2 = manager.getBean<DummyClass>("multiple_of_same_bean");
@@ -95,17 +96,17 @@ BOOST_AUTO_TEST_SUITE(BeanManager_Test_Suite)
     }
 
     BOOST_AUTO_TEST_CASE(Retreive_bean_as_wrong_type) {
-        camb::di::BeanManager manager;
+        cadf::di::BeanManager manager;
         manager.registerBean<DummyClass&>("test_for_type_check");
         // Verify that the original bean was actually added
         DummyClass bean = manager.getBean<DummyClass&>("test_for_type_check");
         BOOST_CHECK_EQUAL(0, bean.getValue());
 
-        BOOST_REQUIRE_THROW(manager.getBean<int>("test_for_type_check"), camb::di::InvalidBeanTypeException);
+        BOOST_REQUIRE_THROW(manager.getBean<int>("test_for_type_check"), cadf::di::InvalidBeanTypeException);
     }
 
     BOOST_AUTO_TEST_CASE(Retreive_bean_not_yet_registered) {
-        camb::di::BeanManager manager;
+        cadf::di::BeanManager manager;
         BOOST_CHECK(!manager.containsBean("this_bean_does_not_exist"));
 
 #ifdef ENABLE_BEAN_AUTOREGISTRATION
@@ -120,12 +121,12 @@ BOOST_AUTO_TEST_SUITE(BeanManager_Test_Suite)
 	BOOST_CHECK_EQUAL(13579, otherPtr->getValue());
 	BOOST_CHECK_EQUAL(autoBean, otherPtr);
 #else
-        BOOST_REQUIRE_THROW(manager.getBean<boost::any>("this_bean_does_not_exist"), camb::di::InvalidBeanNameException);
+        BOOST_REQUIRE_THROW(manager.getBean<boost::any>("this_bean_does_not_exist"), cadf::di::InvalidBeanNameException);
 #endif
     }
 
     BOOST_AUTO_TEST_CASE(Bean_instance_scalar) {
-        camb::di::BeanManager manager;
+        cadf::di::BeanManager manager;
         DummyClass instance(101);
         manager.registerBeanInstance<DummyClass>("instance_scalar", instance);
 
@@ -135,7 +136,7 @@ BOOST_AUTO_TEST_SUITE(BeanManager_Test_Suite)
     }
 
     BOOST_AUTO_TEST_CASE(Bean_instance_reference) {
-        camb::di::BeanManager manager;
+        cadf::di::BeanManager manager;
         DummyClass instance(101);
         manager.registerBeanInstance<DummyClass&>("instance_reference", instance);
 
@@ -145,7 +146,7 @@ BOOST_AUTO_TEST_SUITE(BeanManager_Test_Suite)
     }
 
     BOOST_AUTO_TEST_CASE(Bean_instance_pointer) {
-        camb::di::BeanManager manager;
+        cadf::di::BeanManager manager;
         DummyClass *instance = new DummyClass(202);
         manager.registerBeanInstance<DummyClass*>("instance_pointer", instance);
 
@@ -160,8 +161,8 @@ BOOST_AUTO_TEST_SUITE(BeanManager_Test_Suite)
         sharedManager.registerBean<A_depends_on_B*>("A_depends_on_B");
         sharedManager.registerBean<B_depends_on_A*>("B_depends_on_A");
 
-        BOOST_REQUIRE_THROW(sharedManager.getBean<A_depends_on_B*>("A_depends_on_B"), camb::di::BeanDependencyCycleException);
-        BOOST_REQUIRE_THROW(sharedManager.getBean<B_depends_on_A*>("B_depends_on_A"), camb::di::BeanDependencyCycleException);
+        BOOST_REQUIRE_THROW(sharedManager.getBean<A_depends_on_B*>("A_depends_on_B"), cadf::di::BeanDependencyCycleException);
+        BOOST_REQUIRE_THROW(sharedManager.getBean<B_depends_on_A*>("B_depends_on_A"), cadf::di::BeanDependencyCycleException);
     }
 
     BOOST_AUTO_TEST_SUITE_END()

@@ -1,9 +1,10 @@
+#include "../../../../include/cadf/di/exception/InvalidBeanException.h"
+
 #include <sstream>
 
-#include "camb/di/exception/InvalidBeanException.h"
-#include "camb/di/Configuration.h"
+#include "cadf/di/Configuration.h"
 
-namespace camb::di {
+namespace cadf::di {
 
     /*
      * Helper functions which translates a vector to a human readable string form. Note, that the type of
@@ -64,7 +65,7 @@ namespace camb::di {
 /*
  * Properly "convert" the ConfigurationWrapperInterface to string for exception reporting purposes
  */
-std::ostream& operator<<(std::ostream &os, const camb::di::ConfigurationWrapperInterface *w) {
-    os << w->getName() << " is missing resources " << camb::di::vectorAsString(w->getWaitingResources());
+std::ostream& operator<<(std::ostream &os, const cadf::di::ConfigurationWrapperInterface *w) {
+    os << w->getName() << " is missing resources " << cadf::di::vectorAsString(w->getWaitingResources());
     return os;
 }

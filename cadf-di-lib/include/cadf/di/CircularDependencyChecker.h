@@ -5,7 +5,7 @@
 #include <vector>
 #include <map>
 
-namespace camb::di {
+namespace cadf::di {
 
     /*
      * Helper class that checks to see whether or not a circular dependency is present between

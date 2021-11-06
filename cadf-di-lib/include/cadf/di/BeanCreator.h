@@ -3,7 +3,7 @@
 
 #include <memory>
 
-namespace camb::di {
+namespace cadf::di {
 
     /*
      * Simple wrapper struct, which allow passing the created type from the BeanCreator

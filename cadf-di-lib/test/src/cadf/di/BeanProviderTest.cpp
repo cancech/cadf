@@ -1,22 +1,23 @@
+
 #define BOOST_TEST_DYN_LINK
 #ifdef STAND_ALONE
 #   define BOOST_TEST_MODULE Main
 #endif
 #include <boost/test/unit_test.hpp>
 
-#include "camb/di/BeanProvider.h"
+#include "cadf/di/BeanProvider.h"
 #include "DummyClass.h"
 
 struct BeanProviderTestCreator {
-        camb::di::ValueWrapper<DummyClass>* create() {
-            return new camb::di::ValueWrapper<DummyClass>(DummyClass(789));
+        cadf::di::ValueWrapper<DummyClass>* create() {
+            return new cadf::di::ValueWrapper<DummyClass>(DummyClass(789));
         }
 };
 
 BOOST_AUTO_TEST_SUITE(BeanProvider_Test_Suite)
 
     BOOST_AUTO_TEST_CASE(Bean_creator_provider) {
-        camb::di::BeanCreatorProvider<DummyClass, BeanProviderTestCreator> provider;
+        cadf::di::BeanCreatorProvider<DummyClass, BeanProviderTestCreator> provider;
 
         DummyClass bean = provider.getBean();
         BOOST_CHECK_EQUAL(789, bean.getValue());
@@ -25,7 +26,7 @@ BOOST_AUTO_TEST_SUITE(BeanProvider_Test_Suite)
     }
 
     BOOST_AUTO_TEST_CASE(Bean_singleton_provider_reference) {
-        camb::di::BeanCreatorProvider<int&, camb::di::SingletonBeanCreator<int&>> provider;
+        cadf::di::BeanCreatorProvider<int&, cadf::di::SingletonBeanCreator<int&>> provider;
 
         int &bean1 = provider.getBean(); // @suppress("Method cannot be resolved")
         int &bean2 = provider.getBean(); // @suppress("Method cannot be resolved")
@@ -34,7 +35,7 @@ BOOST_AUTO_TEST_SUITE(BeanProvider_Test_Suite)
     }
 
     BOOST_AUTO_TEST_CASE(Bean_singleton_provider_pointer) {
-        camb::di::BeanCreatorProvider<DummyClass*, camb::di::SingletonBeanCreator<DummyClass*>> provider;
+        cadf::di::BeanCreatorProvider<DummyClass*, cadf::di::SingletonBeanCreator<DummyClass*>> provider;
 
         DummyClass *bean1 = provider.getBean();
         DummyClass *bean2 = provider.getBean();
@@ -43,7 +44,7 @@ BOOST_AUTO_TEST_SUITE(BeanProvider_Test_Suite)
     }
 
     BOOST_AUTO_TEST_CASE(Bean_factory_provider_scalar) {
-        camb::di::BeanCreatorProvider<DummyClass, camb::di::FactoryBeanCreator<DummyClass>> provider;
+        cadf::di::BeanCreatorProvider<DummyClass, cadf::di::FactoryBeanCreator<DummyClass>> provider;
 
         DummyClass bean1 = provider.getBean();
         DummyClass bean2 = provider.getBean();
@@ -52,7 +53,7 @@ BOOST_AUTO_TEST_SUITE(BeanProvider_Test_Suite)
     }
 
     BOOST_AUTO_TEST_CASE(Bean_factory_provider_pointer) {
-        camb::di::BeanCreatorProvider<int*, camb::di::FactoryBeanCreator<int*>> provider;
+        cadf::di::BeanCreatorProvider<int*, cadf::di::FactoryBeanCreator<int*>> provider;
 
         int *bean1 = provider.getBean();
         int *bean2 = provider.getBean();
@@ -64,7 +65,7 @@ BOOST_AUTO_TEST_SUITE(BeanProvider_Test_Suite)
 
     BOOST_AUTO_TEST_CASE(Bean_instance_provider) {
         DummyClass instance(987);
-        camb::di::BeanInstanceProvider<DummyClass*> provider(&instance);
+        cadf::di::BeanInstanceProvider<DummyClass*> provider(&instance);
 
         DummyClass *bean = provider.getBean();
         BOOST_CHECK_EQUAL(instance.getValue(), bean->getValue());

@@ -3,11 +3,11 @@
 
 #include <vector>
 
-#include "camb/di/BeanManager.h"
-#include "camb/di/ConfigurationMacro.h"
-#include "camb/di/exception/InvalidBeanException.h"
+#include "cadf/di/BeanManager.h"
+#include "cadf/di/ConfigurationMacro.h"
+#include "cadf/di/exception/InvalidBeanException.h"
 
-namespace camb::di {
+namespace cadf::di {
 
     class ConfigurationWrapperInterface;
     template<class Config>

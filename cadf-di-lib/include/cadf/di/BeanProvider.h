@@ -3,9 +3,10 @@
 
 #include <type_traits>
 #include <string>
-#include "camb/di/BeanCreator.h"
 
-namespace camb::di {
+#include "cadf/di/BeanCreator.h"
+
+namespace cadf::di {
 
     /*
      * The base base class for bean providers. Due to limitations of C++ this is the type that will be tracked

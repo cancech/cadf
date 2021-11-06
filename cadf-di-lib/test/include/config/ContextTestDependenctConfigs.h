@@ -3,7 +3,7 @@
 
 #include <cassert>
 
-#include "camb/di/Configuration.h"
+#include "cadf/di/Configuration.h"
 #include "DummyClass.h"
 
 // Config which provides a single bean
@@ -19,7 +19,7 @@ END_CONFIGURATION
 CONFIGURATION(ProviderConsumerManagerTestConfig)
 
     BEANS(
-            (BEAN, DummyClass, camb::di::FactoryBeanCreator<DummyClass>, "providerConsumerDummyFactory")
+            (BEAN, DummyClass, cadf::di::FactoryBeanCreator<DummyClass>, "providerConsumerDummyFactory")
     )
 
     RESOURCES(

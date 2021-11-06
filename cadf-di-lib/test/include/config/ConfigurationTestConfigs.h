@@ -1,7 +1,7 @@
 #ifndef CONFIG_CONFIGURATIONTESTCONFIGS_H_
 #define CONFIG_CONFIGURATIONTESTCONFIGS_H_
 
-#include "camb/di/Configuration.h"
+#include "cadf/di/Configuration.h"
 #include "DummyClass.h"
 
 // Configuration that is expected to not have its resources fulfilled.
@@ -39,7 +39,7 @@ CONFIGURATION(ProviderTestConfig)
         }
 
     BEANS(
-            (BEAN, DummyClass, camb::di::FactoryBeanCreator<DummyClass>, "providerDummyClassFactory"),
+            (BEAN, DummyClass, cadf::di::FactoryBeanCreator<DummyClass>, "providerDummyClassFactory"),
             (BEAN, DummyClass*, "providerDummyClassSingleton"),
             (BEAN_INSTANCE, int&, "providerSomeIntValue", someIntValue)
     )

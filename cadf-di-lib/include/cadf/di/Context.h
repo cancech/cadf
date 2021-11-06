@@ -3,10 +3,10 @@
 
 #include <vector>
 
-#include "camb/di/CircularDependencyChecker.h"
-#include "camb/di/Configuration.h"
+#include "cadf/di/CircularDependencyChecker.h"
+#include "cadf/di/Configuration.h"
 
-namespace camb::di {
+namespace cadf::di {
 
     /*
      * Assembler for configurations, that will allow any number of configurations to be registered, and allow

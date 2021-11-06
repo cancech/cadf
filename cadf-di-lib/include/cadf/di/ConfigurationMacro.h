@@ -3,9 +3,9 @@
 
 // Macro which will start the definition of a configuration file.
 #define CONFIGURATION(Config) \
-	class Config: public camb::di::BaseConfiguration { \
+	class Config: public cadf::di::BaseConfiguration { \
 	public: \
-		Config(camb::di::BeanManager* manager): BaseConfiguration(manager) {} \
+		Config(cadf::di::BeanManager* manager): BaseConfiguration(manager) {} \
 		static std::string getName() { return #Config; }
 
 /*
@@ -56,7 +56,7 @@
 
 // Add dependency configurations
 #define DEPENDENCIES(...) \
-	static void registerDependentConfigurations(camb::di::Context* context) { \
+	static void registerDependentConfigurations(cadf::di::Context* context) { \
 		static bool isLoading = false; \
 		if (isLoading) return; \
 		isLoading = true; \

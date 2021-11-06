@@ -1,6 +1,6 @@
-#include "camb/di/BeanManager.h"
+#include "cadf/di/BeanManager.h"
 
-namespace camb::di {
+namespace cadf::di {
 
 // DTOR
     BeanManager::~BeanManager() {
