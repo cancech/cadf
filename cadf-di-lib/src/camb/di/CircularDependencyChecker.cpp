@@ -1,7 +1,7 @@
 #include <iostream>
 #include <algorithm>
 
-#include "di/CircularDependencyChecker.h"
+#include "camb/di/CircularDependencyChecker.h"
 
 namespace camb::di {
 

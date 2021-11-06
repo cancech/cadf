@@ -4,9 +4,12 @@ project(cadf-di-lib-test)
 find_package (Boost 1.65 REQUIRED COMPONENTS unit_test_framework)
 list(APPEND INCLUDE_DIRS ${BOOST_INCLUDE_DIRS})
 
-file(GLOB_RECURSE sources_test src/*.cpp)
+file(GLOB_RECURSE sources_test src/camb/di/*.cpp)
 
-add_executable(cadf-di-test ${sources_test})
+add_executable(cadf-di-test 
+    src/testMain.cpp
+    ${sources_test}
+)
 target_include_directories(cadf-di-test PUBLIC include)
 target_link_libraries(cadf-di-test cadf-di)
 target_link_libraries(cadf-di-test

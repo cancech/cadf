@@ -3,7 +3,7 @@
 
 #include <cassert>
 
-#include "di/Configuration.h"
+#include "camb/di/Configuration.h"
 #include "DummyClass.h"
 
 // Config which provides a single bean

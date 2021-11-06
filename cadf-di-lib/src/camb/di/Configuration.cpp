@@ -1,4 +1,4 @@
-#include "di/Configuration.h"
+#include "camb/di/Configuration.h"
 
 namespace camb::di {
 

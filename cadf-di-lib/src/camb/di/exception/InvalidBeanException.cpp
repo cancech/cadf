@@ -1,7 +1,7 @@
 #include <sstream>
 
-#include "di/exception/InvalidBeanException.h"
-#include "di/Configuration.h"
+#include "camb/di/exception/InvalidBeanException.h"
+#include "camb/di/Configuration.h"
 
 namespace camb::di {
 

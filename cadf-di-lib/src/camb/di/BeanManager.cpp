@@ -1,4 +1,4 @@
-#include "di/BeanManager.h"
+#include "camb/di/BeanManager.h"
 
 namespace camb::di {
 

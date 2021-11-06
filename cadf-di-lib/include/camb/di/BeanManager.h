@@ -7,8 +7,8 @@
 #include <algorithm>
 #include <typeinfo>
 
-#include "di/BeanProvider.h"
-#include "di/exception/InvalidBeanException.h"
+#include "camb/di/BeanProvider.h"
+#include "camb/di/exception/InvalidBeanException.h"
 
 namespace camb::di {
 

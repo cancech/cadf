@@ -1,7 +1,7 @@
 #ifndef CONFIG_CONFIGURATIONTESTCONFIGS_H_
 #define CONFIG_CONFIGURATIONTESTCONFIGS_H_
 
-#include "di/Configuration.h"
+#include "camb/di/Configuration.h"
 #include "DummyClass.h"
 
 // Configuration that is expected to not have its resources fulfilled.

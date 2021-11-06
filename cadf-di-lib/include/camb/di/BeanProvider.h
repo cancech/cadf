@@ -3,7 +3,7 @@
 
 #include <type_traits>
 #include <string>
-#include "di/BeanCreator.h"
+#include "camb/di/BeanCreator.h"
 
 namespace camb::di {
 

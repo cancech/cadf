@@ -4,11 +4,11 @@ project(cadf-di-lib)
 #Compile the CORM library
 include_directories(include)
 add_library(cadf-di SHARED
-		src/di/exception/InvalidBeanException.cpp
-		src/di/BeanManager.cpp
-		src/di/CircularDependencyChecker.cpp
-		src/di/Configuration.cpp
-		src/di/Context.cpp
+		src/camb/di/exception/InvalidBeanException.cpp
+		src/camb/di/BeanManager.cpp
+		src/camb/di/CircularDependencyChecker.cpp
+		src/camb/di/Configuration.cpp
+		src/camb/di/Context.cpp
 )
 target_compile_options(cadf-di PUBLIC -Wall -c -fmessage-length=0 -fPIC)
 

@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "di/CircularDependencyChecker.h"
-#include "di/Configuration.h"
+#include "camb/di/CircularDependencyChecker.h"
+#include "camb/di/Configuration.h"
 
 namespace camb::di {
 

@@ -3,9 +3,9 @@
 
 #include <vector>
 
-#include "di/BeanManager.h"
-#include "di/ConfigurationMacro.h"
-#include "di/exception/InvalidBeanException.h"
+#include "camb/di/BeanManager.h"
+#include "camb/di/ConfigurationMacro.h"
+#include "camb/di/exception/InvalidBeanException.h"
 
 namespace camb::di {
 

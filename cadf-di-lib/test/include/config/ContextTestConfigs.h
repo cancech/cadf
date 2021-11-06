@@ -1,7 +1,7 @@
 #ifndef CONFIG_CONTEXTTESTCONFIGS_H_
 #define CONFIG_CONTEXTTESTCONFIGS_H_
 
-#include "di/Configuration.h"
+#include "camb/di/Configuration.h"
 
 // Configuration which required a couple of resources, which are expected to be missing.
 CONFIGURATION(SingleConfigMissingResourcesTestConfig)
