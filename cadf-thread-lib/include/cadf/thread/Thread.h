@@ -1,11 +1,11 @@
 #ifndef CAMB_THREAD_THREAD_H_
 #define CAMB_THREAD_THREAD_H_
 
-#include "camb/thread/Task.h"
+#include "cadf/thread/Task.h"
 #include <thread>
 #include <atomic>
 
-namespace camb {
+namespace cadf::thread {
 
     /**
      * Helper that makes sure that the interruption is properly configured for a thread.

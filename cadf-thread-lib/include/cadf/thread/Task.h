@@ -3,7 +3,7 @@
 
 #include <csignal>
 
-namespace camb {
+namespace cadf::thread {
 
     /**
      * Task that is to be executed within a Thread. The logic of the task it be contained within the exec(), with scheduleStop() being used to allow

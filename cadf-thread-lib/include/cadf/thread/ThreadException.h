@@ -4,7 +4,7 @@
 #include <string>
 #include <stdexcept>
 
-namespace camb {
+namespace cadf::thread {
 
     /**
      * Exception that is to be thrown when initializing a thread

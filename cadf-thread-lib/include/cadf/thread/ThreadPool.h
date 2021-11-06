@@ -7,7 +7,7 @@
 #include <mutex>
 #include <condition_variable>
 
-namespace camb {
+namespace cadf::thread {
 
     /**
      * Interface for the ThreadPool that the Threaded aspects of the CAMB will use.

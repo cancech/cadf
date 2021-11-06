@@ -1,11 +1,11 @@
 #ifndef CAMB_THREAD_BASICTHREADPOOL_H_
 #define CAMB_THREAD_BASICTHREADPOOL_H_
 
-#include "camb/thread/ThreadPool.h"
+#include "cadf/thread/ThreadPool.h"
 
 #include <thread>
 
-namespace camb {
+namespace cadf::thread {
     /**
      * Concrete (and basic) thread pool implementation that implements the IThreadPool interface
      */
