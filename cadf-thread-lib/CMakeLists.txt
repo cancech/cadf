@@ -1,17 +1,25 @@
 cmake_minimum_required(VERSION 3.10)
-project(cadf-thread-lib)
+project(cadf-thread VERSION ${CADF_VERSION})
 
 #Compile the Thread library                                                                                                                                                                                                       
 include_directories(include)
-add_library(cadf-thread SHARED
+add_library(${PROJECT_NAME} SHARED
         src/cadf/thread/BasicThreadPool.cpp
         src/cadf/thread/Task.cpp
         src/cadf/thread/Thread.cpp
 )
-target_compile_options(cadf-thread PUBLIC -Wall -c -fmessage-length=0 -fPIC)
-
+add_library(cadf::thread ALIAS ${PROJECT_NAME})                                                                                                                                                                                          
+target_include_directories(${PROJECT_NAME} PUBLIC include)
+set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${CADF_VERSION} 
+                                      SOVERSION ${CADF_VERSION_MINOR})
 add_subdirectory(test)
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+include(GNUInstallDirs)
+install(
+    TARGETS ${PROJECT_NAME}
+    EXPORT cadf-targets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+INSTALL(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
