@@ -1,7 +1,7 @@
 #ifndef CAMB_THREAD_THREAD_H_
 #define CAMB_THREAD_THREAD_H_
 
-#include "cadf/thread/Task.h"
+#include "thread/Task.h"
 #include <thread>
 #include <atomic>
 

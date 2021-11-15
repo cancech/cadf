@@ -1,5 +1,5 @@
-#include "cadf/thread/BasicThreadPool.h"
-#include "cadf/thread/ThreadException.h"
+#include "thread/BasicThreadPool.h"
+#include "thread/ThreadException.h"
 
 #include <sstream>
 

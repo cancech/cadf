@@ -1,7 +1,7 @@
 #ifndef INCLUDE_TESTTASK_H_
 #define INCLUDE_TESTTASK_H_
 
-#include "cadf/thread/Task.h"
+#include "thread/Task.h"
 #include <unistd.h>
 
 class TestNonBlockingTask: public cadf::thread::Task {

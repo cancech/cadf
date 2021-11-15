@@ -4,7 +4,7 @@
 #endif
 #include <boost/test/unit_test.hpp>
 
-#include "cadf/thread/ThreadException.h"
+#include "thread/ThreadException.h"
 
 /**
  * Unit test for the Thread Exceptions

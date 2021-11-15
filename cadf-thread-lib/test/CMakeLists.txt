@@ -8,7 +8,7 @@ find_package(Threads REQUIRED)
 find_package (Boost 1.65 REQUIRED COMPONENTS unit_test_framework)
 list(APPEND INCLUDE_DIRS ${BOOST_INCLUDE_DIRS})                                                                                                                                                                                           
 
-file(GLOB_RECURSE sources_test src/cadf/thread/*.cpp)
+file(GLOB_RECURSE sources_test src/thread/*.cpp)
 
 add_executable(${PROJECT_NAME} 
     src/testMain.cpp

@@ -4,9 +4,9 @@ project(cadf-thread VERSION ${CADF_VERSION})
 #Compile the Thread library                                                                                                                                                                                                       
 include_directories(include)
 add_library(${PROJECT_NAME} SHARED
-        src/cadf/thread/BasicThreadPool.cpp
-        src/cadf/thread/Task.cpp
-        src/cadf/thread/Thread.cpp
+        src/thread/BasicThreadPool.cpp
+        src/thread/Task.cpp
+        src/thread/Thread.cpp
 )
 add_library(cadf::thread ALIAS ${PROJECT_NAME})                                                                                                                                                                                          
 target_include_directories(${PROJECT_NAME} PUBLIC include)
@@ -22,4 +22,4 @@ install(
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
-INSTALL(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+INSTALL(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cadf-${CADF_VERSION})

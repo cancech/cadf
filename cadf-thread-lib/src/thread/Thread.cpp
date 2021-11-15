@@ -1,5 +1,5 @@
-#include "cadf/thread/Thread.h"
-#include "cadf/thread/ThreadException.h"
+#include "thread/Thread.h"
+#include "thread/ThreadException.h"
 #include <functional>
 #include <future>
 

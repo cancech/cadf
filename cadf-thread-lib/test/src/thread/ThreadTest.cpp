@@ -6,8 +6,8 @@
 #include <boost/test/unit_test.hpp>
 #include <thread>
 
-#include "cadf/thread/Thread.h"
-#include "cadf/thread/ThreadException.h"
+#include "thread/Thread.h"
+#include "thread/ThreadException.h"
 
 #include <TestTask.h>
 

@@ -6,8 +6,8 @@
 #include <chrono>
 #include <thread>
 
-#include "cadf/thread/BasicThreadPool.h"
-#include "cadf/thread/ThreadException.h"
+#include "thread/BasicThreadPool.h"
+#include "thread/ThreadException.h"
 
 // Test helpers for the ThreadPoolTest
 namespace BasicThreadPoolTest {

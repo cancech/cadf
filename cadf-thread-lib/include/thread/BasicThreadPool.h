@@ -1,7 +1,7 @@
 #ifndef CAMB_THREAD_BASICTHREADPOOL_H_
 #define CAMB_THREAD_BASICTHREADPOOL_H_
 
-#include "cadf/thread/ThreadPool.h"
+#include "thread/ThreadPool.h"
 
 #include <thread>
 

@@ -6,7 +6,7 @@
 #include <boost/test/unit_test.hpp>
 #include <thread>
 
-#include <cadf/thread/Task.h>
+#include <thread/Task.h>
 
 #include <TestTask.h>
 
