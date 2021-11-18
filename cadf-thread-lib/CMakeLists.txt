@@ -36,4 +36,5 @@ INSTALL(DIRECTORY include/ DESTINATION ${include_dest})
 INSTALL(EXPORT ${PROJECT_NAME}-targets
         FILE ${PROJECT_NAME}.cmake
         DESTINATION ${lib_dest})
-INSTALL(FILES cadf-thread-config.cmake DESTINATION ${lib_dest})
+configure_file(cadf-thread-config-version.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/cadf-thread-config-version.cmake @ONLY)
+INSTALL(FILES cadf-thread-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/cadf-thread-config-version.cmake DESTINATION ${lib_dest})
