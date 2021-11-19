@@ -23,5 +23,5 @@ endif ()
 
 
 
-add_subdirectory(cadf-thread-lib)
+add_subdirectory(thread-lib)
 
