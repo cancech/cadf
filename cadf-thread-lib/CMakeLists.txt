@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(cadf-thread VERSION ${CADF_VERSION})
+project(thread VERSION ${CADF_VERSION})
 
 include(GNUInstallDirs)
 set(include_dest ${CMAKE_INSTALL_INCLUDEDIR}/cadf-${CADF_VERSION})
@@ -32,9 +32,10 @@ install(
     LIBRARY DESTINATION ${lib_dest}
     ARCHIVE DESTINATION ${lib_dest}
 )
-INSTALL(DIRECTORY include/ DESTINATION ${include_dest})
-INSTALL(EXPORT ${PROJECT_NAME}-targets
+install(DIRECTORY include/ DESTINATION ${include_dest})
+install(EXPORT ${PROJECT_NAME}-targets
         FILE ${PROJECT_NAME}.cmake
+        NAMESPACE cadf::
         DESTINATION ${lib_dest})
-configure_file(cadf-thread-config-version.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/cadf-thread-config-version.cmake @ONLY)
-INSTALL(FILES cadf-thread-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/cadf-thread-config-version.cmake DESTINATION ${lib_dest})
+configure_file(cadf::${PROJECT_NAME}-config-version.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/cadf::${PROJECT_NAME}-config-version.cmake @ONLY)
+install(FILES cadf::${PROJECT_NAME}-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/cadf::${PROJECT_NAME}-config-version.cmake DESTINATION ${lib_dest})
