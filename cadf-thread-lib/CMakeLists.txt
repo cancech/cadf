@@ -20,7 +20,7 @@ add_library(cadf::thread ALIAS ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PUBLIC 
                            $<BUILD_INTERFACE:${MY_LIBRARY_SOURCE_DIR}/include>
                            $<INSTALL_INTERFACE:${include_dest}>)
-target_link_libraries(${PROJECT_NAME} Threads::Threads)
+target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads)
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${CADF_VERSION} 
                                       SOVERSION ${CADF_VERSION_MINOR})
 add_subdirectory(test)
