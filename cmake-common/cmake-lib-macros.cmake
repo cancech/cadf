@@ -1,7 +1,6 @@
 # Configures the a shared library for compilation
 #
-# param0 - src_files - list of source files that are to be includes in the library
-# param1 - link_libs - list of external libraries that this library depends on
+# param0 - link_libs - list of external libraries that this library depends on
 function(configure_lib link_libs)
     file(GLOB_RECURSE src_files CONFIGURE_DEPENDS src/*.cpp)
     add_library(${PROJECT_NAME} SHARED ${src_files})
