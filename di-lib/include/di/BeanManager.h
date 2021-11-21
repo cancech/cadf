@@ -7,8 +7,8 @@
 #include <algorithm>
 #include <typeinfo>
 
-#include "cadf/di/BeanProvider.h"
-#include "cadf/di/exception/InvalidBeanException.h"
+#include "di/BeanProvider.h"
+#include "di/exception/InvalidBeanException.h"
 
 namespace cadf::di {
 

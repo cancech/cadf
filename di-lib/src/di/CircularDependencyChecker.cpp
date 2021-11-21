@@ -1,4 +1,4 @@
-#include "cadf/di/CircularDependencyChecker.h"
+#include "di/CircularDependencyChecker.h"
 
 #include <iostream>
 #include <algorithm>

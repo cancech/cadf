@@ -6,7 +6,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/any.hpp>
 
-#include "cadf/di/BeanManager.h"
+#include "di/BeanManager.h"
 #include "DummyClass.h"
 
 struct BeanManagerTestCreator {

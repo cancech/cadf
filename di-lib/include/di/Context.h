@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "cadf/di/CircularDependencyChecker.h"
-#include "cadf/di/Configuration.h"
+#include "di/CircularDependencyChecker.h"
+#include "di/Configuration.h"
 
 namespace cadf::di {
 

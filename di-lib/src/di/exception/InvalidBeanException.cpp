@@ -1,8 +1,7 @@
-#include "../../../../include/cadf/di/exception/InvalidBeanException.h"
+#include "di/exception/InvalidBeanException.h"
+#include "di/Configuration.h"
 
 #include <sstream>
-
-#include "cadf/di/Configuration.h"
 
 namespace cadf::di {
 

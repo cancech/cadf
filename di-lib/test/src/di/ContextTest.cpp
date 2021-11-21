@@ -5,7 +5,7 @@
 #endif
 #include <boost/test/unit_test.hpp>
 
-#include "cadf/di/Context.h"
+#include "di/Context.h"
 
 #include "config/ContextTestConfigs.h"
 #include "config/ContextTestBeanMismatchConfigs.h"

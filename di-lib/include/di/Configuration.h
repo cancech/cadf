@@ -3,9 +3,9 @@
 
 #include <vector>
 
-#include "cadf/di/BeanManager.h"
-#include "cadf/di/ConfigurationMacro.h"
-#include "cadf/di/exception/InvalidBeanException.h"
+#include "di/BeanManager.h"
+#include "di/ConfigurationMacro.h"
+#include "di/exception/InvalidBeanException.h"
 
 namespace cadf::di {
 

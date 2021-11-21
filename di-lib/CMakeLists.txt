@@ -1,19 +1,16 @@
 cmake_minimum_required(VERSION 3.10)
-project(cadf-di-lib)
+project(di VERSION ${CADF_VERSION})
 
-#Compile the CORM library
-include_directories(include)
-add_library(cadf-di SHARED
-		src/cadf/di/exception/InvalidBeanException.cpp
-		src/cadf/di/BeanManager.cpp
-		src/cadf/di/CircularDependencyChecker.cpp
-		src/cadf/di/Configuration.cpp
-		src/cadf/di/Context.cpp
+# Configure for compilation and linking
+set(SRC_FILES
+		src/di/exception/InvalidBeanException.cpp
+		src/di/BeanManager.cpp
+		src/di/CircularDependencyChecker.cpp
+		src/di/Configuration.cpp
+		src/di/Context.cpp
 )
-target_compile_options(cadf-di PUBLIC -Wall -c -fmessage-length=0 -fPIC)
+configure_lib("${SRC_FILES}" "")
 
-add_subdirectory(test)
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+# Support for test and deployment
+#add_subdirectory(test)
+common_install()

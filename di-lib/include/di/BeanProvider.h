@@ -4,7 +4,7 @@
 #include <type_traits>
 #include <string>
 
-#include "cadf/di/BeanCreator.h"
+#include "di/BeanCreator.h"
 
 namespace cadf::di {
 

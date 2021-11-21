@@ -1,4 +1,4 @@
-#include "cadf/di/Configuration.h"
+#include "di/Configuration.h"
 
 namespace cadf::di {
 

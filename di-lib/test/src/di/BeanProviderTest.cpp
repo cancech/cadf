@@ -5,7 +5,7 @@
 #endif
 #include <boost/test/unit_test.hpp>
 
-#include "cadf/di/BeanProvider.h"
+#include "di/BeanProvider.h"
 #include "DummyClass.h"
 
 struct BeanProviderTestCreator {

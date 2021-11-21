@@ -1,4 +1,4 @@
-#include "cadf/di/BeanManager.h"
+#include "di/BeanManager.h"
 
 namespace cadf::di {
 
