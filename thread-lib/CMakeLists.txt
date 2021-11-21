@@ -1,41 +1,20 @@
 cmake_minimum_required(VERSION 3.10)
 project(thread VERSION ${CADF_VERSION})
 
-include(GNUInstallDirs)
-set(include_dest ${CMAKE_INSTALL_INCLUDEDIR}/cadf-${CADF_VERSION})
-set(lib_dest ${CMAKE_INSTALL_LIBDIR}/cadf-${CADF_VERSION})
+# The extra stuff required for the thread dependencies
+set(CMAKE_THREAD_PREFER_PTHREAD ON)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
 
-set(CMAKE_THREAD_PREFER_PTHREAD ON)                                                                                                                                                                                                           
-set(THREADS_PREFER_PTHREAD_FLAG ON)                                                                                                                                                                                                           
-find_package(Threads REQUIRED) 
-
-#Compile the Thread library                                                                                                                                                                                                       
-include_directories(include)
-add_library(${PROJECT_NAME} SHARED
+# Configure for compilation and linking
+set(SRC_FILES 
         src/thread/BasicThreadPool.cpp
         src/thread/Task.cpp
         src/thread/Thread.cpp
 )
-add_library(cadf::thread ALIAS ${PROJECT_NAME})                                                                                                                                                                                          
-target_include_directories(${PROJECT_NAME} PUBLIC 
-                           $<BUILD_INTERFACE:${MY_LIBRARY_SOURCE_DIR}/include>
-                           $<INSTALL_INTERFACE:${include_dest}>)
-target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads)
-set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${CADF_VERSION} 
-                                      SOVERSION ${CADF_VERSION_MINOR})
-add_subdirectory(test)
+set(LINK_LIBS Threads::Threads)
+configure_lib("${SRC_FILES}" "${LINK_LIBS}")
 
-install(
-    TARGETS ${PROJECT_NAME}
-    EXPORT ${PROJECT_NAME}-targets
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${lib_dest}
-    ARCHIVE DESTINATION ${lib_dest}
-)
-install(DIRECTORY include/ DESTINATION ${include_dest})
-install(EXPORT ${PROJECT_NAME}-targets
-        FILE ${PROJECT_NAME}.cmake
-        NAMESPACE cadf::
-        DESTINATION ${lib_dest})
-configure_file(cadf::${PROJECT_NAME}-config-version.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/cadf::${PROJECT_NAME}-config-version.cmake @ONLY)
-install(FILES cadf::${PROJECT_NAME}-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/cadf::${PROJECT_NAME}-config-version.cmake DESTINATION ${lib_dest})
+# Support for test and deployment
+add_subdirectory(test)
+common_install()
