@@ -5,5 +5,5 @@ project(di VERSION ${CADF_VERSION})
 configure_lib("")
 
 # Support for test and deployment
-#add_subdirectory(test)
+add_subdirectory(test)
 common_install()

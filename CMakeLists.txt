@@ -29,6 +29,9 @@ include(GNUInstallDirs)
 set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/cadf-${CADF_VERSION})
 set(LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cadf-${CADF_VERSION})
 
+# External dependency versions
+set (BOOST_REQ_VERSION "1.65")
+
 # Ensure that the common scripts and support files are made available
 add_subdirectory(cmake-common)
 # Add all of the libraries that create the framework
