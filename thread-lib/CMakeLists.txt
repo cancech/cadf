@@ -7,13 +7,7 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 # Configure for compilation and linking
-set(SRC_FILES 
-        src/thread/BasicThreadPool.cpp
-        src/thread/Task.cpp
-        src/thread/Thread.cpp
-)
-set(LINK_LIBS Threads::Threads)
-configure_lib("${SRC_FILES}" "${LINK_LIBS}")
+configure_lib("Threads::Threads")
 
 # Support for test and deployment
 add_subdirectory(test)

@@ -2,7 +2,8 @@
 #
 # param0 - src_files - list of source files that are to be includes in the library
 # param1 - link_libs - list of external libraries that this library depends on
-function(configure_lib src_files link_libs)
+function(configure_lib link_libs)
+    file(GLOB_RECURSE src_files CONFIGURE_DEPENDS src/*.cpp)
     add_library(${PROJECT_NAME} SHARED ${src_files})
     add_library(cadf::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
     target_include_directories(${PROJECT_NAME} PUBLIC
