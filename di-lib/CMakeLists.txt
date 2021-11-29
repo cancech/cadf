@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
+include("../standalone_project.cmake")
 project(di VERSION ${CADF_VERSION})
 
 # Configure for compilation and linking

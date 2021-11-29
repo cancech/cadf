@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
+include("../standalone_project.cmake")
 project(thread VERSION ${CADF_VERSION})
 
 # The extra stuff required for the thread dependencies
