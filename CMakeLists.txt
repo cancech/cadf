@@ -73,4 +73,5 @@ if (NOT DEFINED PROJECT_BUILD)
     # Add all of the libraries that create the framework
     add_subdirectory(thread-lib)
     add_subdirectory(di-lib)
+    add_subdirectory(dom-lib)
 endif()
