@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.10)
-include("../standalone_project.cmake")
 
 # The extra stuff required for the thread dependencies
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
