@@ -3,7 +3,6 @@ macro(test_setup)
     enable_testing()
     find_package(Boost ${BOOST_REQ_VERSION} REQUIRED COMPONENTS unit_test_framework)
     list(APPEND INCLUDE_DIRS ${BOOST_INCLUDE_DIRS})
-    
 endmacro()
 
 # Configure for building the test case

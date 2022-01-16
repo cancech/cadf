@@ -1,0 +1,3 @@
+include(${CMAKE_CURRENT_LIST_DIR}/cadf-thread-config-version.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cadf-thread-config-targets.cmake)
+find_package(Threads REQUIRED)

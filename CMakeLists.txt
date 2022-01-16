@@ -16,20 +16,19 @@ endmacro()
 ###############################################################################
 # Details of the version and overall framework
 ###############################################################################
+
+# Configure the version
 def_var_with_parent(CADF_VERSION_MAJOR 0)
 def_var_with_parent(CADF_VERSION_MINOR 0)
 def_var_with_parent(CADF_VERSION_PATCH 1)
 def_var_with_parent(CADF_VERSION ${CADF_VERSION_MAJOR}.${CADF_VERSION_MINOR}.${CADF_VERSION_PATCH})
 
-###############################################################################
 # Details of the framework project
-###############################################################################
-project("cadf" VERSION ${CADF_VERSION} DESCRIPTION "C++ Application Development Framework")
+set(project cadf)
+project(${project} VERSION ${CADF_VERSION} DESCRIPTION "C++ Application Development Framework")
 enable_testing()
 
-###############################################################################
 # General settings for building
-###############################################################################
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 set(CMAKE_DISABLE_SOURCE_CHANGES  ON)
 
@@ -40,9 +39,7 @@ endif ()
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 set(CMAKE_COLOR_MAKEFILE   ON)
 
-###############################################################################
 # Remove 'lib' prefix for shared libraries on Windows
-###############################################################################
 if (WIN32)
   set(CMAKE_SHARED_LIBRARY_PREFIX "")
 endif ()
@@ -51,23 +48,15 @@ endif ()
 # General settings for deploying
 ###############################################################################
 include(GNUInstallDirs)
-def_var_with_parent(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/cadf-${CADF_VERSION})
-def_var_with_parent(LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cadf-${CADF_VERSION})
+def_var_with_parent(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/${project}-${CADF_VERSION})
+def_var_with_parent(LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/${project}-${CADF_VERSION})
 
-###############################################################################
 # External dependency versions
-###############################################################################
 set (BOOST_REQ_VERSION "1.65")
-
-###############################################################################
 # Ensure that the common scripts and support files are made available
-###############################################################################
 add_subdirectory(cmake-common)
 
-###############################################################################
-# Add the contained sub-projects so that they can all be included in a full
-# cadf build
-###############################################################################
+# Add the contained sub-projects so that they can all be included in a full build
 if (NOT DEFINED PROJECT_BUILD)
     set(FULL_BUILD true)
     # Add all of the libraries that create the framework
@@ -75,3 +64,25 @@ if (NOT DEFINED PROJECT_BUILD)
     add_subdirectory(di-lib)
     add_subdirectory(dom-lib)
 endif()
+
+# Setup the configuration for the parent project
+configure_file(${project}-config.cmake
+  "${CMAKE_BINARY_DIR}/${project}-config.cmake"
+  @ONLY
+)
+
+# Setup the version information for the parent project 
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "${CMAKE_BINARY_DIR}/${project}-config-version.cmake"
+  VERSION ${version}
+  COMPATIBILITY AnyNewerVersion
+)
+
+# The configuration for allowing components to be accessed
+install(
+  FILES
+    "${CMAKE_BINARY_DIR}/${project}-config.cmake"
+    "${CMAKE_BINARY_DIR}/${project}-config-version.cmake"
+  DESTINATION ${LIB_INSTALL_DIR}
+)
