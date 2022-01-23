@@ -48,9 +48,9 @@ namespace JSONNodeTest {
             }
 
             // Mocks to use for testing
-            fakeit::Mock<camb::dom::JSONValue> mockValue1;
-            fakeit::Mock<camb::dom::JSONValue> mockValue2;
-            fakeit::Mock<camb::dom::JSONValue> mockValue3;
+            fakeit::Mock<cadf::dom::JSONValue> mockValue1;
+            fakeit::Mock<cadf::dom::JSONValue> mockValue2;
+            fakeit::Mock<cadf::dom::JSONValue> mockValue3;
     };
 
     /**
@@ -67,7 +67,7 @@ namespace JSONNodeTest {
             }
 
             // The class to test
-            camb::dom::JSONNode node;
+            cadf::dom::JSONNode node;
     };
 }
 
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_SUITE(JSONNode_Test_Suite)
         fakeit::Verify(Method(mockValue1, getName)).Exactly(1);
 
         // Verify that can retrieve the value
-        const std::vector<camb::dom::JSONValue*> values = node.getValue(VAL_1_NAME);
+        const std::vector<cadf::dom::JSONValue*> values = node.getValue(VAL_1_NAME);
         BOOST_CHECK_EQUAL(1, values.size());
         BOOST_CHECK_EQUAL(&mockValue1.get(), values[0]);
 
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_SUITE(JSONNode_Test_Suite)
         node.setValue(&mockValue2.get());
         fakeit::Verify(Method(mockValue2, getName)).Exactly(1);
 
-        const std::vector<camb::dom::JSONValue*> &valuesVal2 = node.getValue(VAL_2_NAME);
+        const std::vector<cadf::dom::JSONValue*> &valuesVal2 = node.getValue(VAL_2_NAME);
         BOOST_CHECK_EQUAL(1, valuesVal2.size());
         BOOST_CHECK_EQUAL(&mockValue2.get(), valuesVal2[0]);
 
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_SUITE(JSONNode_Test_Suite)
         node.setValue(&mockValue3.get());
         fakeit::Verify(Method(mockValue3, getName)).Exactly(1);
 
-        const std::vector<camb::dom::JSONValue*> &valuesVal3 = node.getValue(VAL_3_NAME);
+        const std::vector<cadf::dom::JSONValue*> &valuesVal3 = node.getValue(VAL_3_NAME);
         BOOST_CHECK_EQUAL(1, valuesVal3.size());
         BOOST_CHECK_EQUAL(&mockValue3.get(), valuesVal3[0]);
 
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_SUITE(JSONNode_Test_Suite)
         node.setValue(&mockValue2.get());
         fakeit::Verify(Method(mockValue2, getName)).Exactly(1);
 
-        const std::vector<camb::dom::JSONValue*> &valuesVal2 = node.getValue(VAL_1_NAME);
+        const std::vector<cadf::dom::JSONValue*> &valuesVal2 = node.getValue(VAL_1_NAME);
         BOOST_CHECK_EQUAL(2, valuesVal2.size());
         BOOST_CHECK_EQUAL(&mockValue1.get(), valuesVal2[0]);
         BOOST_CHECK_EQUAL(&mockValue2.get(), valuesVal2[1]);
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_SUITE(JSONNode_Test_Suite)
         node.setValue(&mockValue3.get());
         fakeit::Verify(Method(mockValue3, getName)).Exactly(1);
 
-        const std::vector<camb::dom::JSONValue*> &valuesVal3 = node.getValue(VAL_1_NAME);
+        const std::vector<cadf::dom::JSONValue*> &valuesVal3 = node.getValue(VAL_1_NAME);
         BOOST_CHECK_EQUAL(3, valuesVal3.size());
         BOOST_CHECK_EQUAL(&mockValue1.get(), valuesVal3[0]);
         BOOST_CHECK_EQUAL(&mockValue2.get(), valuesVal3[1]);
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_SUITE(JSONNode_Test_Suite)
         node.setValue(&mockValue2.get());
         fakeit::Verify(Method(mockValue2, getName)).Exactly(1);
 
-        std::vector<camb::dom::JSONValue*> values = node.getValue(VAL_1_NAME);
+        std::vector<cadf::dom::JSONValue*> values = node.getValue(VAL_1_NAME);
         BOOST_CHECK_EQUAL(1, values.size());
         BOOST_CHECK_EQUAL(&mockValue1.get(), values[0]);
 
@@ -212,10 +212,10 @@ BOOST_AUTO_TEST_SUITE(JSONNode_Test_Suite)
      * Verify that an exception is throw when trying to add an invalid value
      */
     BOOST_FIXTURE_TEST_CASE(SetInvalidValueTest, JSONNodeTest::TestFixture) {
-        BOOST_REQUIRE_THROW(node.setValue(NULL), camb::dom::JSONTreeException);
+        BOOST_REQUIRE_THROW(node.setValue(NULL), cadf::dom::JSONTreeException);
 
         fakeit::When(Method(mockValue1, getName)).AlwaysReturn("");
-        BOOST_REQUIRE_THROW(node.setValue(&mockValue1.get()), camb::dom::JSONTreeException);
+        BOOST_REQUIRE_THROW(node.setValue(&mockValue1.get()), cadf::dom::JSONTreeException);
         fakeit::Verify(Method(mockValue1, getName)).Exactly(1);
     }
 
@@ -223,11 +223,11 @@ BOOST_AUTO_TEST_SUITE(JSONNode_Test_Suite)
      * Verify that an exception is throw when trying to add an invalid value
      */
     BOOST_FIXTURE_TEST_CASE(GetInvalidValueTest, JSONNodeTest::TestFixture) {
-        BOOST_REQUIRE_THROW(node.getValue(""), camb::dom::JSONTreeException);
-        BOOST_REQUIRE_THROW(node.getValue(VAL_1_NAME), camb::dom::JSONTreeException);
-        BOOST_REQUIRE_THROW(node.getValue(VAL_2_NAME), camb::dom::JSONTreeException);
-        BOOST_REQUIRE_THROW(node.getValue(VAL_3_NAME), camb::dom::JSONTreeException);
-        BOOST_REQUIRE_THROW(node.getValue("THIS NAME DOES NOT EXIST"), camb::dom::JSONTreeException);
+        BOOST_REQUIRE_THROW(node.getValue(""), cadf::dom::JSONTreeException);
+        BOOST_REQUIRE_THROW(node.getValue(VAL_1_NAME), cadf::dom::JSONTreeException);
+        BOOST_REQUIRE_THROW(node.getValue(VAL_2_NAME), cadf::dom::JSONTreeException);
+        BOOST_REQUIRE_THROW(node.getValue(VAL_3_NAME), cadf::dom::JSONTreeException);
+        BOOST_REQUIRE_THROW(node.getValue("THIS NAME DOES NOT EXIST"), cadf::dom::JSONTreeException);
     }
 
     BOOST_AUTO_TEST_SUITE_END()

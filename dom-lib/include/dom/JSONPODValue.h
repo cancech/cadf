@@ -3,7 +3,7 @@
 
 #include "dom/JSONValue.h"
 
-namespace camb::dom {
+namespace cadf::dom {
     /**
      * JSON Value that represents some plain old data. The data is specified and retrieved via templated means (constructor/method),
      * however it is stored internally as a string. Therefore it is converted to a string on creation, and from on retrieval.

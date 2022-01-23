@@ -1,6 +1,6 @@
 #include "dom/JSONExtractor.h"
 
-namespace camb::dom {
+namespace cadf::dom {
 
     /*
      * CTOR
@@ -42,7 +42,7 @@ namespace camb::dom {
         if (parent == NULL)
             throw JSONTreeException("Valid parent node required");
 
-        const JSONNode *node = dynamic_cast<const camb::dom::JSONNode*>(parent);
+        const JSONNode *node = dynamic_cast<const cadf::dom::JSONNode*>(parent);
         if (node == NULL)
             throw JSONTreeException("Cannot retrieve value from parent \"" + parent->getName() + "\" as it is not a node");
 

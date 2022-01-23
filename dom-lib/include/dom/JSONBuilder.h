@@ -4,7 +4,7 @@
 #include "dom/JSONPODValue.h"
 #include "dom/JSONRootNode.h"
 
-namespace camb::dom {
+namespace cadf::dom {
 
     class JSONParser;
 

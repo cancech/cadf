@@ -1,6 +1,6 @@
 #include "dom/JSONRootNode.h"
 
-namespace camb::dom {
+namespace cadf::dom {
     /*
      * CTOR
      */

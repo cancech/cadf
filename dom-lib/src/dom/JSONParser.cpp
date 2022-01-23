@@ -4,7 +4,7 @@
 #include <sstream>
 #include <cctype>
 
-namespace camb::dom {
+namespace cadf::dom {
     /*
      * Create the parser and retrieve the root
      */

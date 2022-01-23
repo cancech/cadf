@@ -18,10 +18,10 @@ BOOST_AUTO_TEST_SUITE(JSONParser_Test_Suite)
  * Verify that can create a load a tree that contains multiple values
  */
     BOOST_AUTO_TEST_CASE(CreateNodeWithMultipleValuesTest) {
-        const camb::dom::JSONValue *root = camb::dom::JSONParser::parse("{\"Test Node\":{\"val1\":1,\"val2\":\"Value 2\",\"val3\":5.4,\"val4\":-5}}");
+        const cadf::dom::JSONValue *root = cadf::dom::JSONParser::parse("{\"Test Node\":{\"val1\":1,\"val2\":\"Value 2\",\"val3\":5.4,\"val4\":-5}}");
 
-        camb::dom::JSONExtractor extractor(root);
-        const camb::dom::JSONValue *testNode = extractor.getChild("Test Node");
+        cadf::dom::JSONExtractor extractor(root);
+        const cadf::dom::JSONValue *testNode = extractor.getChild("Test Node");
         BOOST_CHECK_EQUAL("Test Node", testNode->getName());
 
         BOOST_CHECK_EQUAL(1, extractor.getValue<int>(testNode, "val1"));
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_SUITE(JSONParser_Test_Suite)
         BOOST_CHECK_EQUAL(-5, extractor.getValue<int>(testNode, "val4"));
 
         // Try retrieving a value as a child
-        const camb::dom::JSONValue *val1Node = extractor.getChild(testNode, "val1");
+        const cadf::dom::JSONValue *val1Node = extractor.getChild(testNode, "val1");
         BOOST_CHECK_EQUAL(1, extractor.getValue<int>(val1Node, "val1"));
 
         delete (root);
@@ -40,17 +40,17 @@ BOOST_AUTO_TEST_SUITE(JSONParser_Test_Suite)
      * Verify that can load a simple tree
      */
     BOOST_AUTO_TEST_CASE(CreateSimpleTreeTest) {
-        const camb::dom::JSONValue *root = camb::dom::JSONParser::parse(
+        const cadf::dom::JSONValue *root = cadf::dom::JSONParser::parse(
                 "{\"Parent Node\":{\"double\":1.23,\"int\":123,\"long\":123123123},\"String value\":\"This is a string!\",\"int1\":123,\"int2\":234,\"int3\":345}");
 
         // Verify the values in the tree
-        camb::dom::JSONExtractor extractor(root);
+        cadf::dom::JSONExtractor extractor(root);
         BOOST_CHECK_EQUAL(123, extractor.getValue<int>("int1"));
         BOOST_CHECK_EQUAL(234, extractor.getValue<int>("int2"));
         BOOST_CHECK_EQUAL(345, extractor.getValue<int>("int3"));
         BOOST_CHECK_EQUAL("This is a string!", extractor.getValue<std::string>("String value"));
 
-        const camb::dom::JSONValue *subNode = extractor.getChild("Parent Node");
+        const cadf::dom::JSONValue *subNode = extractor.getChild("Parent Node");
         BOOST_CHECK_EQUAL(123, extractor.getValue<int>(subNode, "int"));
         BOOST_CHECK_EQUAL(1.23, extractor.getValue<double>(subNode, "double"));
         BOOST_CHECK_EQUAL(123123123, extractor.getValue<long>(subNode, "long"));
@@ -73,16 +73,16 @@ BOOST_AUTO_TEST_SUITE(JSONParser_Test_Suite)
                 "},"
                 "\"value\":\"File\""
                 "}}";
-        const camb::dom::JSONValue *root = camb::dom::JSONParser::parse(json);
+        const cadf::dom::JSONValue *root = cadf::dom::JSONParser::parse(json);
 
         // Verify the contents of the tree
-        camb::dom::JSONExtractor extractor(root);
-        const camb::dom::JSONValue *subNodeMenu = extractor.getChild("menu");
+        cadf::dom::JSONExtractor extractor(root);
+        const cadf::dom::JSONValue *subNodeMenu = extractor.getChild("menu");
         BOOST_CHECK_EQUAL("file", extractor.getValue<std::string>(subNodeMenu, "id"));
         BOOST_CHECK_EQUAL("File", extractor.getValue<std::string>(subNodeMenu, "value"));
 
-        const camb::dom::JSONValue *subNodePopup = extractor.getChild(subNodeMenu, "popup");
-        const std::vector<camb::dom::JSONValue*> &subNodesMenuItem = extractor.getChildArray(subNodePopup, "menuitem");
+        const cadf::dom::JSONValue *subNodePopup = extractor.getChild(subNodeMenu, "popup");
+        const std::vector<cadf::dom::JSONValue*> &subNodesMenuItem = extractor.getChildArray(subNodePopup, "menuitem");
         BOOST_CHECK_EQUAL(3, subNodesMenuItem.size());
 
         BOOST_CHECK_EQUAL("New", extractor.getValue<std::string>(subNodesMenuItem[0], "value"));
@@ -113,14 +113,14 @@ BOOST_AUTO_TEST_SUITE(JSONParser_Test_Suite)
                 "}],"
                 "\"name\":\"John\""
                 "}";
-        const camb::dom::JSONValue *root = camb::dom::JSONParser::parse(json);
+        const cadf::dom::JSONValue *root = cadf::dom::JSONParser::parse(json);
 
         // Verify contents of the tree
-        camb::dom::JSONExtractor extractor(root);
+        cadf::dom::JSONExtractor extractor(root);
         BOOST_CHECK_EQUAL(30, extractor.getValue<int>("age"));
         BOOST_CHECK_EQUAL("John", extractor.getValue<std::string>("name"));
 
-        const std::vector<camb::dom::JSONValue*> &subNodeCars = extractor.getChildArray("cars");
+        const std::vector<cadf::dom::JSONValue*> &subNodeCars = extractor.getChildArray("cars");
         BOOST_CHECK_EQUAL(3, subNodeCars.size());
 
         BOOST_CHECK_EQUAL("Ford", extractor.getValue<std::string>(subNodeCars[0], "name"));
@@ -164,14 +164,14 @@ BOOST_AUTO_TEST_SUITE(JSONParser_Test_Suite)
                 "}\t \n\v]\t \n\v,\t \n\v"
                 "\"name\"\t \n\v:\t \n\v\"John\"\t \n\v"
                 "}\t \n\v\t \n\v\t \n\v";
-        const camb::dom::JSONValue *root = camb::dom::JSONParser::parse(json);
+        const cadf::dom::JSONValue *root = cadf::dom::JSONParser::parse(json);
 
         // Verify contents of the tree
-        camb::dom::JSONExtractor extractor(root);
+        cadf::dom::JSONExtractor extractor(root);
         BOOST_CHECK_EQUAL(30, extractor.getValue<int>("age"));
         BOOST_CHECK_EQUAL("John", extractor.getValue<std::string>("name"));
 
-        const std::vector<camb::dom::JSONValue*> &subNodeCars = extractor.getChildArray("cars");
+        const std::vector<cadf::dom::JSONValue*> &subNodeCars = extractor.getChildArray("cars");
         BOOST_CHECK_EQUAL(3, subNodeCars.size());
 
         BOOST_CHECK_EQUAL("Ford", extractor.getValue<std::string>(subNodeCars[0], "name"));
@@ -201,18 +201,18 @@ BOOST_AUTO_TEST_SUITE(JSONParser_Test_Suite)
      * Verify that exceptions are properly thrown when the JSON is malformed.
      */
     BOOST_AUTO_TEST_CASE(MalformedJsonTest) {
-        BOOST_REQUIRE_THROW(camb::dom::JSONParser::parse(""), std::out_of_range);
-        BOOST_REQUIRE_THROW(camb::dom::JSONParser::parse("\"key\":123"), camb::dom::JSONParseException);
-        BOOST_REQUIRE_THROW(camb::dom::JSONParser::parse("{\"key\":123,"), std::out_of_range);
-        BOOST_REQUIRE_THROW(camb::dom::JSONParser::parse("{\"key\":123,"), std::out_of_range);
-        BOOST_REQUIRE_THROW(camb::dom::JSONParser::parse("{\"key\":12 3}"), camb::dom::JSONParseException);
-        BOOST_REQUIRE_THROW(camb::dom::JSONParser::parse("{\"key\":123]"), camb::dom::JSONParseException);
-        BOOST_REQUIRE_THROW(camb::dom::JSONParser::parse("{key:123}"), camb::dom::JSONParseException);
-        BOOST_REQUIRE_THROW(camb::dom::JSONParser::parse("{\"key\":[123}}"), camb::dom::JSONParseException);
-        BOOST_REQUIRE_THROW(camb::dom::JSONParser::parse("{\"key\":}"), camb::dom::JSONParseException);
-        BOOST_REQUIRE_THROW(camb::dom::JSONParser::parse("{\"key\":]}"), camb::dom::JSONParseException);
-        BOOST_REQUIRE_THROW(camb::dom::JSONParser::parse("{\"key\":,}"), camb::dom::JSONParseException);
-        BOOST_REQUIRE_THROW(camb::dom::JSONParser::parse("{\"key\"::}"), camb::dom::JSONParseException);
+        BOOST_REQUIRE_THROW(cadf::dom::JSONParser::parse(""), std::out_of_range);
+        BOOST_REQUIRE_THROW(cadf::dom::JSONParser::parse("\"key\":123"), cadf::dom::JSONParseException);
+        BOOST_REQUIRE_THROW(cadf::dom::JSONParser::parse("{\"key\":123,"), std::out_of_range);
+        BOOST_REQUIRE_THROW(cadf::dom::JSONParser::parse("{\"key\":123,"), std::out_of_range);
+        BOOST_REQUIRE_THROW(cadf::dom::JSONParser::parse("{\"key\":12 3}"), cadf::dom::JSONParseException);
+        BOOST_REQUIRE_THROW(cadf::dom::JSONParser::parse("{\"key\":123]"), cadf::dom::JSONParseException);
+        BOOST_REQUIRE_THROW(cadf::dom::JSONParser::parse("{key:123}"), cadf::dom::JSONParseException);
+        BOOST_REQUIRE_THROW(cadf::dom::JSONParser::parse("{\"key\":[123}}"), cadf::dom::JSONParseException);
+        BOOST_REQUIRE_THROW(cadf::dom::JSONParser::parse("{\"key\":}"), cadf::dom::JSONParseException);
+        BOOST_REQUIRE_THROW(cadf::dom::JSONParser::parse("{\"key\":]}"), cadf::dom::JSONParseException);
+        BOOST_REQUIRE_THROW(cadf::dom::JSONParser::parse("{\"key\":,}"), cadf::dom::JSONParseException);
+        BOOST_REQUIRE_THROW(cadf::dom::JSONParser::parse("{\"key\"::}"), cadf::dom::JSONParseException);
     }
 
     BOOST_AUTO_TEST_SUITE_END()

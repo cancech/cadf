@@ -8,7 +8,7 @@
 
 namespace JSONValueTest {
 
-    void assertJSONValue(std::string expectedName, std::string expectedToString, const camb::dom::JSONValue &actual) {
+    void assertJSONValue(std::string expectedName, std::string expectedToString, const cadf::dom::JSONValue &actual) {
         BOOST_CHECK_EQUAL(expectedName, actual.getName());
         BOOST_CHECK_EQUAL(expectedToString, actual.toString());
         BOOST_CHECK_EQUAL("", actual.valueToString());
@@ -24,9 +24,9 @@ BOOST_AUTO_TEST_SUITE(JSONValue_Test_Suite)
  * Verify that the created JSONValue contains the data as expected
  */
     BOOST_AUTO_TEST_CASE(CreateTest) {
-        JSONValueTest::assertJSONValue("MyName", "\"MyName\":", camb::dom::JSONValue("MyName"));
-        JSONValueTest::assertJSONValue("JSON Value", "\"JSON Value\":", camb::dom::JSONValue("JSON Value"));
-        JSONValueTest::assertJSONValue("Some other value", "\"Some other value\":", camb::dom::JSONValue("Some other value"));
+        JSONValueTest::assertJSONValue("MyName", "\"MyName\":", cadf::dom::JSONValue("MyName"));
+        JSONValueTest::assertJSONValue("JSON Value", "\"JSON Value\":", cadf::dom::JSONValue("JSON Value"));
+        JSONValueTest::assertJSONValue("Some other value", "\"Some other value\":", cadf::dom::JSONValue("Some other value"));
     }
 
     BOOST_AUTO_TEST_SUITE_END()

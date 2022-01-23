@@ -1,7 +1,7 @@
 #include "dom/JSONNode.h"
 #include <iostream>
 
-namespace camb::dom {
+namespace cadf::dom {
 
     /*
      * CTOR

@@ -1,6 +1,6 @@
 #include "dom/JSONBuilder.h"
 
-namespace camb::dom {
+namespace cadf::dom {
 
     /*
      * CTOR

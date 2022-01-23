@@ -4,7 +4,7 @@
 #include "dom/JSONPODValue.h"
 #include "dom/JSONNode.h"
 
-namespace camb::dom {
+namespace cadf::dom {
 
     /**
      * Allows for easy extraction of data from within the JSON tree. Does not allow for any form of exploration of the
@@ -167,9 +167,9 @@ namespace camb::dom {
              * @return bool true if the value was successfully retrieved
              */
             template<typename T>
-            bool tryGetValueFromPOD(const camb::dom::JSONValue *value, const std::string &name, std::vector<T>& result) const {
+            bool tryGetValueFromPOD(const cadf::dom::JSONValue *value, const std::string &name, std::vector<T>& result) const {
                 // Check if this is the appropriate type of node
-                const JSONPODValue *pod = dynamic_cast<const camb::dom::JSONPODValue*>(value);
+                const JSONPODValue *pod = dynamic_cast<const cadf::dom::JSONPODValue*>(value);
                 if (!pod)
                     return false;
 
@@ -195,7 +195,7 @@ namespace camb::dom {
              * @return bool true if the value was successfully retrieved
              */
             template<typename T>
-            bool tryGetValueFromNode(const camb::dom::JSONValue *value, const std::string &name, std::vector<T>& result) const {
+            bool tryGetValueFromNode(const cadf::dom::JSONValue *value, const std::string &name, std::vector<T>& result) const {
                 // Make sure that it's the right type of node
                 const JSONNode *node = dynamic_cast<const JSONNode*>(value);
                 if (!node)

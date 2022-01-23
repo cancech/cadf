@@ -32,7 +32,7 @@ namespace JSONRootNodeTest {
             }
 
             // Mocks to use for testing
-            fakeit::Mock<camb::dom::JSONValue> mockValue;
+            fakeit::Mock<cadf::dom::JSONValue> mockValue;
     };
 
     /**
@@ -49,13 +49,13 @@ namespace JSONRootNodeTest {
             }
 
             // The class to test
-            camb::dom::JSONRootNode root;
+            cadf::dom::JSONRootNode root;
     };
 
     /**
      * Test class to be used to verify that the added memory is also cleaned up.
      */
-    class MemTestNode: public camb::dom::JSONValue {
+    class MemTestNode: public cadf::dom::JSONValue {
         public:
             static bool isInitialized;
 
@@ -73,7 +73,7 @@ namespace JSONRootNodeTest {
     /**
      * Helper class that is to be used to expose the addToMemory() method of the root node.
      */
-    class MemExposeRootNode: public camb::dom::JSONRootNode {
+    class MemExposeRootNode: public cadf::dom::JSONRootNode {
         public:
             void exposeAddToMemory(JSONValue* value) {
                 JSONRootNode::addToMemory(value);
@@ -100,8 +100,8 @@ BOOST_AUTO_TEST_SUITE(JSONRootNode_Test_Suite)
      * Verify that the root node cannot be added as a child
      */
     BOOST_FIXTURE_TEST_CASE(AddRootAsChildTest, JSONRootNodeTest::TestFixture) {
-        camb::dom::JSONNode node("ChildNode");
-        BOOST_REQUIRE_THROW(node.setValue(&root), camb::dom::JSONTreeException);
+        cadf::dom::JSONNode node("ChildNode");
+        BOOST_REQUIRE_THROW(node.setValue(&root), cadf::dom::JSONTreeException);
     }
 
     /**

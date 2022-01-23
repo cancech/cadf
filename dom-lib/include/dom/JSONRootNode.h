@@ -3,7 +3,7 @@
 
 #include "dom/JSONNode.h"
 
-namespace camb::dom {
+namespace cadf::dom {
 
     class JSONBuilder;
 

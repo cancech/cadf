@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace camb::dom {
+namespace cadf::dom {
 
     /**
      * Exception to be used when an issue is encountered parsing a JSON tree

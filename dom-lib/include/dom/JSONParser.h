@@ -3,7 +3,7 @@
 
 #include "dom/JSONBuilder.h"
 
-namespace camb::dom {
+namespace cadf::dom {
 
     /**
      * Parser to convert an input JSON string into a tree for internal parsing.
@@ -13,7 +13,7 @@ namespace camb::dom {
             /**
              * Parses the input string and generates a JSON tree from it. The JSONEXtractor can then be used to extract data from the generated tree.
              *
-             * @throws std::out_of_range or camb::json::JSONParseException if there is an issue parsing the input JSON string into a JSON tree.
+             * @throws std::out_of_range or cadf::json::JSONParseException if there is an issue parsing the input JSON string into a JSON tree.
              * @param &json const std::string the JSON string to parse
              * @return const JSONValue* the root of the JSON Tree.
              */
@@ -37,7 +37,7 @@ namespace camb::dom {
             /**
              * Get the root of the generated tree. This triggers the processing of the input string, and no other supporting method should be called directly.
              *
-             * @throws std::out_of_range or camb::json::JSONParseException if there is an issue parsing the input JSON string into a JSON tree.
+             * @throws std::out_of_range or cadf::json::JSONParseException if there is an issue parsing the input JSON string into a JSON tree.
              * @return const JSONValue* the root of the JSON Tree.
              */
             const JSONValue* get();
