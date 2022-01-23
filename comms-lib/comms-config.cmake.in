@@ -1,0 +1,2 @@
+include(${CMAKE_CURRENT_LIST_DIR}/@project@-@component@-config-version.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/@project@-@component@-config-targets.cmake)

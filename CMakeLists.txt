@@ -47,6 +47,7 @@ add_subdirectory(cmake-common)
 add_subdirectory(thread-lib)
 add_subdirectory(di-lib)
 add_subdirectory(dom-lib)
+add_subdirectory(comms-lib)
 
 # Setup the configuration for the parent project
 configure_file(${project}-config.cmake
