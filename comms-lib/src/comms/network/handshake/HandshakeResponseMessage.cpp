@@ -60,7 +60,8 @@ namespace cadf::comms {
      * Populate the JSON builder with information contained within the message.
      */
     template<>
-    void cadf::comms::json::populateBuilder<HandshakeResponseDataV1>(const HandshakeResponseDataV1 &data, JSONValue *subRoot, JSONBuilder &builder) {
+    void cadf::comms::json::populateBuilder<HandshakeResponseDataV1>(const HandshakeResponseDataV1 &data, cadf::dom::JSONValue *subRoot,
+            cadf::dom::JSONBuilder &builder) {
         builder.addValue(subRoot, "clientType", data.clientType);
         builder.addValue(subRoot, "clientInstance", data.clientInstance);
     }
@@ -69,7 +70,8 @@ namespace cadf::comms {
      * Load the message data from the provided JSON
      */
     template<>
-    void cadf::comms::json::loadFromBuilder<HandshakeResponseDataV1>(HandshakeResponseDataV1 &data, const JSONValue *subRoot, const JSONExtractor &extractor) {
+    void cadf::comms::json::loadFromBuilder<HandshakeResponseDataV1>(HandshakeResponseDataV1 &data, const cadf::dom::JSONValue *subRoot,
+            const cadf::dom::JSONExtractor &extractor) {
         data.clientType = extractor.getValue<int>(subRoot, "clientType");
         data.clientInstance = extractor.getValue<int>(subRoot, "clientInstance");
     }

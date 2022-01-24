@@ -4,7 +4,7 @@
 #include "TestData.h"
 #include "comms/message/MessageFactory.h"
 #include "comms/message/Message.h"
-#include "comms/network/serializer/json/JSONBuilder.h"
+#include "dom/JSONBuilder.h"
 
 bool operator==(const TestData& lhs, const TestData& rhs) {
     return lhs.val1 == rhs.val1 &&
@@ -43,13 +43,13 @@ size_t cadf::comms::json::sizeOfJSON<TestData>(const TestData &data) {
 }
 
 template<>
-void cadf::comms::json::populateBuilder<TestData>(const TestData &data, JSONValue *subRoot, JSONBuilder &builder) {
+void cadf::comms::json::populateBuilder<TestData>(const TestData &data, cadf::dom::JSONValue *subRoot, cadf::dom::JSONBuilder &builder) {
     builder.addValue(subRoot, "val1", data.val1);
     builder.addValue(subRoot, "val2", data.val2);
 }
 
 template<>
-void cadf::comms::json::loadFromBuilder<TestData>(TestData &data, const JSONValue *subRoot, const JSONExtractor &extractor) {
+void cadf::comms::json::loadFromBuilder<TestData>(TestData &data, const cadf::dom::JSONValue *subRoot, const cadf::dom::JSONExtractor &extractor) {
     data.val1 = extractor.getValue<int>(subRoot, "val1");
     data.val2 = extractor.getValue<double>(subRoot, "val2");
 }

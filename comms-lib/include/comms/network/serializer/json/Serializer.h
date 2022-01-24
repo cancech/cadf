@@ -44,12 +44,12 @@ namespace cadf::comms::json {
              * Note: this is dependent on pre-existing external populateBuilder functions being available for the population of the JSON tree with the data.
              */
             void serialize(OutputBuffer *buffer) {
-                JSONBuilder builder;
+                cadf::dom::JSONBuilder builder;
                 builder.addValue("type", m_type);
                 builder.addValue("instance", m_instance);
                 builder.addValue("message", m_msgType);
                 populateBuilder<T>(m_message->getData(), builder.createNode("data"), builder);
-                const JSONValue *root = builder.getRoot();
+                const cadf::dom::JSONValue *root = builder.getRoot();
                 std::string json = root->toString();
                 buffer->append(json.c_str(), json.size() + 1); // +1 for the null terminator
                 delete (root);
@@ -99,9 +99,9 @@ namespace cadf::comms::json {
 
         private:
             // The root of the loaded JSON tree created from the JSON string
-            const JSONValue *m_root;
+            const cadf::dom::JSONValue *m_root;
             // The extractor for loading values from the JSON tree
-            JSONExtractor m_extractor;
+            cadf::dom::JSONExtractor m_extractor;
     };
 
     /**

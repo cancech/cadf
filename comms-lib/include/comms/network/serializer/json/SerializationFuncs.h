@@ -4,9 +4,9 @@
 #include <sstream>
 
 #include "comms/network/Buffer.h"
-#include "comms/network/serializer/json/JSONBuilder.h"
-#include "comms/network/serializer/json/JSONExtractor.h"
-#include "comms/network/serializer/json/JSONParser.h"
+#include "dom/JSONBuilder.h"
+#include "dom/JSONExtractor.h"
+#include "dom/JSONParser.h"
 
 namespace cadf::comms::json {
 
@@ -44,23 +44,25 @@ namespace cadf::comms::json {
      *
      * @template T the type of class (struct) representing the data to send
      * @param &data const T reference to the data that is to be converted to JSON.
-     * @param &builder JSONBuilder reference to the builder for creating the JSON structure
+     * @param *subRoot cadf::dom::JSONValue where the value is to be placed within the JSON tree
+     * @param &builder cadf::dom::JSONBuilder reference to the builder for creating the JSON structure
      */
     template<class T>
-    void populateBuilder(const T &data, JSONValue *subRoot, JSONBuilder &builder);
+    void populateBuilder(const T &data, cadf::dom::JSONValue *subRoot, cadf::dom::JSONBuilder &builder);
 
     /**
      * Implementation of this function is to be provided with each data (type T) that is to be used with the JSON Protocol.
      *
      * Load the contents of the data from the JSON tree.
      *
-     * @throws std::out_of_range or cadf::comms::json::JSONTreeException or cadf::comms::json::JSONParseException if there is an issue parsing the data from the JSON in the buffer
+     * @throws std::out_of_range or cadf::dom::JSONTreeException or cadf::dom::JSONParseException if there is an issue parsing the data from the JSON in the buffer
      * @template T the type of class (struct) representing the data to load
      * @param &data T reference to the data whose contents is to be loaded
-     * @param &extractor JSONExtractor reference to the extractor for loading specific values from the tree
+     * @param *subRoot cadf::dom::JSONValue from which the value is to be loaded
+     * @param &extractor cadf::dom::JSONExtractor reference to the extractor for loading specific values from the tree
      */
     template<class T>
-    void loadFromBuilder(T &data, const JSONValue *subRoot, const JSONExtractor &extractor);
+    void loadFromBuilder(T &data, const cadf::dom::JSONValue *subRoot, const cadf::dom::JSONExtractor &extractor);
 
     /**
      * Determine the number of characters required to represent the value in the JSON string. By default it will simply convert the value to a string and provide the number of
