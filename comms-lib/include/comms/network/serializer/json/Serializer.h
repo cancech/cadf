@@ -32,6 +32,7 @@ namespace cadf::comms::json {
              * @return size_t the number of bytes (characters) required in order to properly serialize the message
              */
             size_t getSize() const {
+                // The produced message will look like
                 // { "message":"msg->getType()","type":recipientType,"instance":recipientInstance,"data":Serializer::serialize(msg->getData())}
                 return m_msgType.size() + json::numOfCharsValue<int>(m_type) + json::numOfCharsValue<int>(m_instance) + json::sizeOfData<T>(m_message->getData()) + 42; // +42 for the extra {"message":"","type":,"instance":,"data":}
             }
