@@ -106,6 +106,7 @@ namespace cadf::comms {
             virtual OutputBuffer* serializeMessage(const MessagePacket &packet) const {
                 const IMessage *msg = packet.getMessage();
                 std::unique_ptr<ISerializer> serializer(m_serializers.at(msg->getType())->buildSerializer(msg, packet.getRecipientType(), packet.getRecipientInstance()));
+                //TODO allow for a static buffer size
                 OutputBuffer *out = new OutputBuffer(serializer->getSize());
                 try {
                     serializer->serialize(out);
