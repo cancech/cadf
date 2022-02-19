@@ -1,6 +1,7 @@
 #include "comms/network/handshake/HandshakeCompleteMessage.h"
+
+#include "comms/network/serializer/dom/Serializer.h"
 #include "comms/network/serializer/binary/Serializer.h"
-#include "comms/network/serializer/json/Serializer.h"
 
 namespace cadf::comms {
     /*
@@ -45,28 +46,20 @@ namespace cadf::comms {
     }
 
     /*
-     * Determine the size of the data when serialized to JSON
-     */
-    template<>
-    size_t cadf::comms::json::sizeOfJSON<HandshakeCompleteData>(const HandshakeCompleteData &data) {
-        return numOfCharsKey("version") + numOfCharsValue(data.version) + 2; // the {} delimiting the JSON structure
-    }
-
-    /*
      * Populate the JSON builder with information contained within the message.
      */
     template<>
-    void cadf::comms::json::populateBuilder<HandshakeCompleteData>(const HandshakeCompleteData &data, cadf::dom::JSONValue *subRoot,
-            cadf::dom::JSONBuilder &builder) {
-        builder.addValue(subRoot, "version", data.version);
+    cadf::dom::DomNode cadf::comms::dom::buildTree<HandshakeCompleteData>(const HandshakeCompleteData &data) {
+        return cadf::dom::buildNode("version", data.version);
     }
 
     /*
      * Load the message data from the provided JSON
      */
     template<>
-    void cadf::comms::json::loadFromBuilder<HandshakeCompleteData>(HandshakeCompleteData &data, const cadf::dom::JSONValue *subRoot,
-            const cadf::dom::JSONExtractor &extractor) {
-        data.version = extractor.getValue<unsigned int>(subRoot, "version");
+    HandshakeCompleteData cadf::comms::dom::loadFromTree<HandshakeCompleteData>(const cadf::dom::DomNode &root) {
+        HandshakeCompleteData data;
+        data.version = root["version"];
+        return data;
     }
 }

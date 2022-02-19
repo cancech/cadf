@@ -1,6 +1,7 @@
 #include "comms/network/handshake/HandshakeResponseMessage.h"
+
+#include "comms/network/serializer/dom/Serializer.h"
 #include "comms/network/serializer/binary/Serializer.h"
-#include "comms/network/serializer/json/Serializer.h"
 
 namespace cadf::comms {
     /*
@@ -47,32 +48,23 @@ namespace cadf::comms {
     }
 
     /*
-     * Determine the size of the data when serialized to JSON
-     */
-    template<>
-    size_t cadf::comms::json::sizeOfJSON<HandshakeResponseDataV1>(const HandshakeResponseDataV1 &data) {
-        return numOfCharsKey("clientType") + numOfCharsValue(data.clientType) + numOfCharsKey("clientInstance") + numOfCharsValue(data.clientInstance)
-                + 2 // the {} delimiting the JSON structure
-                + 1; // the , separating the values
-    }
-
-    /*
      * Populate the JSON builder with information contained within the message.
      */
     template<>
-    void cadf::comms::json::populateBuilder<HandshakeResponseDataV1>(const HandshakeResponseDataV1 &data, cadf::dom::JSONValue *subRoot,
-            cadf::dom::JSONBuilder &builder) {
-        builder.addValue(subRoot, "clientType", data.clientType);
-        builder.addValue(subRoot, "clientInstance", data.clientInstance);
+    cadf::dom::DomNode cadf::comms::dom::buildTree<HandshakeResponseDataV1>(const HandshakeResponseDataV1 &data) {
+        cadf::dom::DomNode node = cadf::dom::buildNode("clientType", data.clientType);
+        node["clientInstance"] = data.clientInstance;
+        return node;
     }
 
     /*
      * Load the message data from the provided JSON
      */
     template<>
-    void cadf::comms::json::loadFromBuilder<HandshakeResponseDataV1>(HandshakeResponseDataV1 &data, const cadf::dom::JSONValue *subRoot,
-            const cadf::dom::JSONExtractor &extractor) {
-        data.clientType = extractor.getValue<int>(subRoot, "clientType");
-        data.clientInstance = extractor.getValue<int>(subRoot, "clientInstance");
+    HandshakeResponseDataV1 cadf::comms::dom::loadFromTree<HandshakeResponseDataV1>(const cadf::dom::DomNode &root) {
+        HandshakeResponseDataV1 data;
+        data.clientType = root["clientType"];
+        data.clientInstance = root["clientInstance"];
+        return data;
     }
 }

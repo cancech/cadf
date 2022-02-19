@@ -1,3 +1,4 @@
+
 #define BOOST_TEST_DYN_LINK
 #ifdef STAND_ALONE
 #   define BOOST_TEST_MODULE Main
@@ -5,7 +6,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "comms/network/serializer/binary/Serializer.h"
-#include "comms/network/serializer/json/Serializer.h"
+#include "comms/network/serializer/dom/Serializer.h"
 
 #include "TestServer.h"
 #include "TestNetNode.h"
@@ -124,7 +125,7 @@ BOOST_AUTO_TEST_SUITE(ClientConnectionIT_Test_Suite)
      * Verify that it is possible to send and receive messages when using the JSON protocol
      */
     BOOST_AUTO_TEST_CASE(JSONConnectAndMessageTest) {
-        ClientConnectionIT::performTest<cadf::comms::json::JSONProtocol>(1234);
+        ClientConnectionIT::performTest<cadf::comms::dom::json::JSONProtocol>(1234);
     }
 
     BOOST_AUTO_TEST_SUITE_END()

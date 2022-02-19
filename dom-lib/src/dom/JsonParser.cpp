@@ -1,48 +1,39 @@
-#include "dom/JSONParser.h"
-#include "dom/JSONException.h"
+#include "dom/JsonParser.h"
+#include "dom/DomException.h"
 
-#include <sstream>
-#include <cctype>
-
-namespace cadf::dom {
-    /*
-     * Create the parser and retrieve the root
-     */
-    const JSONValue* JSONParser::parse(const std::string &json) {
-        JSONParser parser(json);
-        return parser.get();
-    }
+namespace cadf::dom::json {
 
     /*
      * CTOR
      */
-    JSONParser::JSONParser(const std::string &json): m_input(json), m_currIndex(0) {
+    JsonParser::JsonParser(const std::string &json): m_input(json), m_currIndex(0) {
     }
 
     /*
-     * Get the root of the created tree.
+     * Parse the string and create a DOM tree
      */
-    const JSONValue* JSONParser::get() {
+    DomNode JsonParser::parse() {
         if (nextCharSkipSpace() != '{')
             throwExpectedCharException("{");
-        loadNext(m_builder.m_root);
-        return m_builder.getRoot();
+
+        return loadNext();
     }
 
     /*
      * Load the next value pair from the input.
      */
-    void JSONParser::loadNext(JSONValue* parent) {
+    DomNode JsonParser::loadNext() {
+        DomNode parent;
         do {
             // The pair must start with a string (name:value)
             std::string name = loadString();
 
             // There must be a ":" separating the name and value
             if (nextCharSkipSpace() !=  ':')
-                return;
+                throwExpectedCharException(":");
 
             // Load the actual value
-            loadValue(parent, name);
+            parent[name] = loadValue();
 
             // Continue until no more values ("," denotes another value is coming up)
         } while(nextCharSkipSpace() == ',');
@@ -52,21 +43,26 @@ namespace cadf::dom {
         // Make sure that it is terminated with "}"
         if (nextCharSkipSpace() != '}')
             throwExpectedCharException("}");
+
+        return parent;
     }
 
     /*
      * Load an array of values.
      */
-    void JSONParser::loadArray(JSONValue *parent, const std::string &name) {
+    DomNode JsonParser::loadArray() {
         // Same as loadNext except that it is just a comma separated list of values all under the previously determined name
+        std::vector<DomNode> arrVals;
         do {
-            loadValue(parent, name);
+            arrVals.push_back(loadValue());
         } while(nextCharSkipSpace() == ',');
         prevChar();
 
         // Array terminator is "]"
         if (nextCharSkipSpace() != ']')
             throwExpectedCharException("]");
+
+        return DomNode(arrVals);
     }
 
     /*
@@ -78,16 +74,15 @@ namespace cadf::dom {
      *
      * Otherwise it is just a regular value (but a value *must* be present)
      */
-    void JSONParser::loadValue(JSONValue *parent, const std::string &name) {
+    DomNode JsonParser::loadValue() {
         switch(peakChar()) {
             case '[':
                 nextChar();
-                loadArray(parent, name);
+                return loadArray();
                 break;
             case '{':
                 nextChar();
-                loadNext(m_builder.createNode(parent, name));
-                break;
+                return loadNext();
             case ']':
             case '}':
             case ':':
@@ -96,19 +91,22 @@ namespace cadf::dom {
                 throwException("value");
                 break;
             case '"':
-                m_builder.addValue(parent, name, loadString());
-                break;
+                return DomNode(loadString(), true);
             default:
-                m_builder.addValue(parent, name, loadUntilNoSpace(",}]").c_str());
+                std::string loaded = loadUntilNoSpace(",}]");
                 prevChar();
-                break;
+                if (loaded == "null")
+                    return DomNode();
+                return DomNode(loaded, false);
         }
+
+        return DomNode();
     }
 
     /*
      * Load a string from the input
      */
-    std::string JSONParser::loadString() {
+    std::string JsonParser::loadString() {
         if (nextCharSkipSpace() != '"')
             throwExpectedCharException("\"");
 
@@ -118,7 +116,7 @@ namespace cadf::dom {
     /*
      * Load until a specified terminator has been reached
      */
-    std::string JSONParser::loadUntilWithSpace(const std::string &terminators) {
+    std::string JsonParser::loadUntilWithSpace(const std::string &terminators) {
         std::stringstream ss;
         char c = nextChar(false);
         while (!checkIfTerminator(c, terminators)) {
@@ -131,7 +129,7 @@ namespace cadf::dom {
     /*
      * Load until a specified terminator has been reached
      */
-    std::string JSONParser::loadUntilNoSpace(const std::string &terminators) {
+    std::string JsonParser::loadUntilNoSpace(const std::string &terminators) {
         std::stringstream ss;
         char c = nextChar(true);
 
@@ -154,7 +152,7 @@ namespace cadf::dom {
     /*
      * Check if the character is an expected terminator
      */
-    bool JSONParser::checkIfTerminator(char c, const std::string &terminators) {
+    bool JsonParser::checkIfTerminator(char c, const std::string &terminators) {
         for (char term: terminators) {
             if (term == c)
                 return true;
@@ -165,7 +163,7 @@ namespace cadf::dom {
     /*
      * Get the next char and advance
      */
-    char JSONParser::nextChar(bool skipSpace) {
+    char JsonParser::nextChar(bool skipSpace) {
         if (skipSpace)
             return nextCharSkipSpace();
 
@@ -175,7 +173,7 @@ namespace cadf::dom {
     /*
      * Get the next char, skipping any whitespace
      */
-    char JSONParser::nextCharSkipSpace() {
+    char JsonParser::nextCharSkipSpace() {
         char c = ' ';
         do {
             c = nextChar(false);
@@ -186,7 +184,7 @@ namespace cadf::dom {
     /*
      * Get the next non-whitespace char without advancing past it.
      */
-    char JSONParser::peakChar() {
+    char JsonParser::peakChar() {
         while(isspace(m_input.at(m_currIndex)))
             m_currIndex++;
         return m_input.at(m_currIndex);
@@ -195,21 +193,21 @@ namespace cadf::dom {
     /*
      * Return to the previous char.
      */
-    void JSONParser::prevChar() {
+    void JsonParser::prevChar() {
         m_currIndex--;
     }
 
     /*
      * Throw an exception.
      */
-    void JSONParser::throwException(const std::string &expected) {
-        throw JSONParseException(expected, m_currIndex);
+    void JsonParser::throwException(const std::string &expected) {
+        throw ParseException(expected, m_currIndex);
     }
 
     /*
      * Convert the array of chars to a more print friendly representation
      */
-    void JSONParser::throwExpectedCharException(const std::string &expected) {
+    void JsonParser::throwExpectedCharException(const std::string &expected) {
         std::stringstream ss;
         for (size_t i = 0; i < expected.size(); i++) {
             ss << "'" << expected[i] << "'";

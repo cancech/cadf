@@ -1,3 +1,4 @@
+
 #define BOOST_TEST_DYN_LINK
 #ifdef STAND_ALONE
 #   define BOOST_TEST_MODULE Main
@@ -7,7 +8,7 @@
 
 #include "comms/network/handshake/HandshakeResponseMessage.h"
 #include "comms/network/serializer/binary/Serializer.h"
-#include "comms/network/serializer/json/Serializer.h"
+#include "comms/network/serializer/dom/Serializer.h"
 
 /**
  * Ensure the correct functionality of the HandshakeResponseV1Message
@@ -95,15 +96,14 @@ BOOST_AUTO_TEST_SUITE(HandshakeResponseMessageV1_Test_Suite)
 
         std::string expectedDataJson = "{\"clientInstance\":687,\"clientType\":457}";
         std::string expectedJson = "{\"data\":" + expectedDataJson + ",\"instance\":643,\"message\":\"HandshakeResponseMessageV1\",\"type\":987}";
-        BOOST_CHECK_EQUAL(expectedDataJson.size() + 1, cadf::comms::json::sizeOfData(data));
 
         cadf::comms::OutputBuffer out(expectedJson.size() + 1);
-        cadf::comms::json::Serializer<cadf::comms::HandshakeResponseDataV1> serializer(&msg, 987, 643);
+        cadf::comms::dom::Serializer<cadf::comms::HandshakeResponseDataV1> serializer(cadf::dom::json::JsonConverter::instance(), &msg, 987, 643);
         serializer.serialize(&out);
         BOOST_CHECK_EQUAL(expectedJson, out.getData());
 
         cadf::comms::InputBuffer in(out.getData(), out.getSize());
-        cadf::comms::json::Deserializer deserializer(&in);
+        cadf::comms::dom::Deserializer deserializer(cadf::dom::json::JsonConverter::instance(), &in);
         BOOST_CHECK_EQUAL("HandshakeResponseMessageV1", deserializer.getMessageType());
         BOOST_CHECK_EQUAL(data, deserializer.getData<cadf::comms::HandshakeResponseDataV1>());
     }

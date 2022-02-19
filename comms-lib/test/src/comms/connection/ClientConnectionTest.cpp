@@ -1,3 +1,4 @@
+
 #define BOOST_TEST_DYN_LINK
 #ifdef STAND_ALONE
 #   define BOOST_TEST_MODULE Main
@@ -6,7 +7,7 @@
 #include <fakeit.hpp>
 
 #include "comms/connection/ClientConnection.h"
-#include "comms/network/serializer/json/Serializer.h"
+#include "comms/network/serializer/dom/Serializer.h"
 
 #include "TestMessage.h"
 
@@ -45,7 +46,7 @@ namespace ClientConnectionTest {
             // Mocks to use for testing
             fakeit::Mock<cadf::comms::IClient> mockClient;
             fakeit::Mock<cadf::comms::IMessageListener> mockListener;
-            fakeit::Mock<cadf::comms::MessageFactory<cadf::comms::json::JSONProtocol>> mockFactory;
+            fakeit::Mock<cadf::comms::MessageFactory<cadf::comms::dom::json::JSONProtocol>> mockFactory;
             fakeit::Mock<cadf::comms::InputBuffer> mockInBuffer;
     };
 
@@ -79,7 +80,7 @@ namespace ClientConnectionTest {
             }
 
             // The class to test
-            cadf::comms::ClientConnection<cadf::comms::json::JSONProtocol> conn;
+            cadf::comms::ClientConnection<cadf::comms::dom::json::JSONProtocol> conn;
     };
 }
 

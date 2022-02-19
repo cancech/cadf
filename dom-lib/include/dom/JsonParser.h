@@ -1,71 +1,54 @@
-#ifndef CAMB_NETWORK_JSON_JSONPARSER_H_
-#define CAMB_NETWORK_JSON_JSONPARSER_H_
+#ifndef DOM_JSONPARSER_H_
+#define DOM_JSONPARSER_H_
 
-#include "dom/JSONBuilder.h"
+#include "dom/DomNode.h"
 
-namespace cadf::dom {
+#include <string>
 
-    /**
-     * Parser to convert an input JSON string into a tree for internal parsing.
-     */
-    class JSONParser {
+namespace cadf::dom::json {
+
+    class JsonParser {
         public:
             /**
-             * Parses the input string and generates a JSON tree from it. The JSONEXtractor can then be used to extract data from the generated tree.
+             * CTOR
              *
-             * @throws std::out_of_range or cadf::json::JSONParseException if there is an issue parsing the input JSON string into a JSON tree.
-             * @param &json const std::string the JSON string to parse
-             * @return const JSONValue* the root of the JSON Tree.
+             * @param &json const std::string containing the JSON representation to parse
              */
-            static const JSONValue* parse(const std::string &json);
+            JsonParser(const std::string &json);
+
+            /**
+             * Parse the JSON string and create a DOM tree for the data
+             *
+             * @return DomNode at the root of the DOM tree
+             */
+            DomNode parse();
 
         private:
             // The input string that is parsed
             const std::string &m_input;
             // The current index of the parse
             size_t m_currIndex;
-            // Builder with which to build the JSON Tree
-            JSONBuilder m_builder;
-
-            /**
-             * CTOR - private to streamline the use of the parse as much as possible. On instantiation will process the input string and generate the tree.
-             *
-             * @param &json const std::string the JSON string to parse
-             */
-            JSONParser(const std::string &json);
-
-            /**
-             * Get the root of the generated tree. This triggers the processing of the input string, and no other supporting method should be called directly.
-             *
-             * @throws std::out_of_range or cadf::json::JSONParseException if there is an issue parsing the input JSON string into a JSON tree.
-             * @return const JSONValue* the root of the JSON Tree.
-             */
-            const JSONValue* get();
-
-
 
             /**
              * Load the next key value pair from the input string.
              *
-             * @param *parent JSONValue pointer to the parent to which the pair belongs
+             * @return DomNode containing the next loaded element
              */
-            void loadNext(JSONValue* parent);
+            DomNode loadNext();
 
             /**
              * Load an array of values
              *
-             * @param *parent JSONValue pointer to the parent to which the array belongs
-             * @param &name const std::string the name of the array
+             * @return DomNode containing the loaded array of elements
              */
-            void loadArray(JSONValue *parent, const std::string &name);
+            DomNode loadArray();
 
             /**
              * Load a single value
              *
-             * @param *parent JSONValue pointer to the parent to which the value belongs
-             * @param &name const std::string the name of the value
+             * @return DomNode containing the loaded value
              */
-            void loadValue(JSONValue *parent, const std::string &name);
+            DomNode loadValue();
 
             /**
              * Load a string from the input. String being denoted in the input by being surrounded by ".
@@ -73,8 +56,6 @@ namespace cadf::dom {
              * @return std::string loaded from the input
              */
             std::string loadString();
-
-
 
             /**
              * Load an element from the input until a terminator is reached. The presence of the terminator is validated by the checkEnd function (i.e.: load until checkEnd returns true).
@@ -105,7 +86,6 @@ namespace cadf::dom {
             bool checkIfTerminator(char c, const std::string &terminators);
 
 
-
             /**
              * Load the next character and advance the input.
              *
@@ -134,8 +114,6 @@ namespace cadf::dom {
              */
             void prevChar();
 
-
-
             /**
              * Throw an exception to indicate that invalid or malformed input was detected.
              *
@@ -150,6 +128,7 @@ namespace cadf::dom {
              */
             void throwExpectedCharException(const std::string &expected);
     };
+
 }
 
-#endif /* CAMB_NETWORK_JSON_JSONPARSER_H_ */
+#endif /* DOM_JSONPARSER_H_ */

@@ -1,10 +1,10 @@
 #include "comms/network/serializer/binary/Serializer.h"
-#include "comms/network/serializer/json/Serializer.h"
 #include "comms/network/Buffer.h"
 #include "TestData.h"
+
+#include "comms/network/serializer/dom/Serializer.h"
 #include "comms/message/MessageFactory.h"
 #include "comms/message/Message.h"
-#include "dom/JSONBuilder.h"
 
 bool operator==(const TestData& lhs, const TestData& rhs) {
     return lhs.val1 == rhs.val1 &&
@@ -36,20 +36,16 @@ TestData cadf::comms::binary::deserializeData<TestData>(cadf::comms::InputBuffer
 }
 
 template<>
-size_t cadf::comms::json::sizeOfJSON<TestData>(const TestData &data) {
-    return numOfCharsKey("val1") + numOfCharsValue(data.val1) + numOfCharsKey("val2") + numOfCharsValue(data.val2)
-            + 2 // the {} delimiting the JSON structure
-            + 1; // The comma between the values
+cadf::dom::DomNode cadf::comms::dom::buildTree<TestData>(const TestData &data) {
+    cadf::dom::DomNode node = cadf::dom::buildNode("val1", data.val1);
+    node["val2"] = data.val2;
+    return node;
 }
 
 template<>
-void cadf::comms::json::populateBuilder<TestData>(const TestData &data, cadf::dom::JSONValue *subRoot, cadf::dom::JSONBuilder &builder) {
-    builder.addValue(subRoot, "val1", data.val1);
-    builder.addValue(subRoot, "val2", data.val2);
-}
-
-template<>
-void cadf::comms::json::loadFromBuilder<TestData>(TestData &data, const cadf::dom::JSONValue *subRoot, const cadf::dom::JSONExtractor &extractor) {
-    data.val1 = extractor.getValue<int>(subRoot, "val1");
-    data.val2 = extractor.getValue<double>(subRoot, "val2");
+TestData cadf::comms::dom::loadFromTree<TestData>(const cadf::dom::DomNode &root) {
+    TestData data;
+    data.val1 = root["val1"];
+    data.val2 = root["val2"];
+    return data;
 }
