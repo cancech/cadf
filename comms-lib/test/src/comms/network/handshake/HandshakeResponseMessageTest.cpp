@@ -8,7 +8,7 @@
 
 #include "comms/network/handshake/HandshakeResponseMessage.h"
 #include "comms/network/serializer/binary/Serializer.h"
-#include "comms/network/serializer/dom/Serializer.h"
+#include "comms/network/serializer/dom/BaseSerializer.h"
 
 /**
  * Ensure the correct functionality of the HandshakeResponseV1Message

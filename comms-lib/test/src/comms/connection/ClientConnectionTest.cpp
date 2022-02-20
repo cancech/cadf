@@ -7,7 +7,7 @@
 #include <fakeit.hpp>
 
 #include "comms/connection/ClientConnection.h"
-#include "comms/network/serializer/dom/Serializer.h"
+#include "comms/network/serializer/dom/JsonSerializer.h"
 
 #include "TestMessage.h"
 

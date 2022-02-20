@@ -6,7 +6,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "comms/network/serializer/binary/Serializer.h"
-#include "comms/network/serializer/dom/Serializer.h"
+#include "comms/network/serializer/dom/JsonSerializer.h"
 
 #include "TestServer.h"
 #include "TestNetNode.h"

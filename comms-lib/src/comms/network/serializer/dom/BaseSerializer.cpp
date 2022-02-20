@@ -1,4 +1,4 @@
-#include "comms/network/serializer/dom/Serializer.h"
+#include "comms/network/serializer/dom/BaseSerializer.h"
 
 namespace cadf::comms::dom {
     /*

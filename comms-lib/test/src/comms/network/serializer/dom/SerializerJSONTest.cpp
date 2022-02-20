@@ -7,7 +7,7 @@
 
 #include "TestData.h"
 #include "TestMessage.h"
-#include "comms/network/serializer/dom/Serializer.h"
+#include "comms/network/serializer/dom/JsonSerializer.h"
 
 /**
  * Test suite for the Serialization functions

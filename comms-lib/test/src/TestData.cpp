@@ -2,7 +2,7 @@
 #include "comms/network/Buffer.h"
 #include "TestData.h"
 
-#include "comms/network/serializer/dom/Serializer.h"
+#include "comms/network/serializer/dom/BaseSerializer.h"
 #include "comms/message/MessageFactory.h"
 #include "comms/message/Message.h"
 

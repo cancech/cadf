@@ -1,6 +1,6 @@
 #include "comms/network/handshake/HandshakeInitMessage.h"
 
-#include "comms/network/serializer/dom/Serializer.h"
+#include "comms/network/serializer/dom/BaseSerializer.h"
 #include "comms/network/serializer/binary/Serializer.h"
 
 namespace cadf::comms {
