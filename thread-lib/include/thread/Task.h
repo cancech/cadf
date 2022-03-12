@@ -12,12 +12,12 @@ namespace cadf::thread {
      * Note: for any blocking behavior an interrupt signal (SIGINT) will be raised when stopping the task. Ensure that any/all blocking behavior respect
      * this signal to properly ensure that the task can terminate on thread stop.
      */
-    class Task {
+    class ITask {
         public:
             /**
              * DTOR
              */
-            virtual ~Task() = default;
+            virtual ~ITask() = default;
 
             /**
              * Override with the details of what the task should perform
@@ -34,7 +34,7 @@ namespace cadf::thread {
      * A convenience task to facilitate a looping/repetitive task. For example the continuous reading of new messages as they arrive. Exec will handle
      * the repetitiveness and scheduleStop will break the loop. The actual logic is to per added into the execLoop().
      */
-    class LoopingTask: public Task {
+    class LoopingTask: public ITask {
         public:
             /**
              * CTOR

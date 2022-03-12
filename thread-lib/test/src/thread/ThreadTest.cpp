@@ -9,7 +9,7 @@
 #include "thread/Thread.h"
 #include "thread/ThreadException.h"
 
-#include <TestTask.h>
+#include "TestTask.h"
 
 namespace ThreadTest {
 

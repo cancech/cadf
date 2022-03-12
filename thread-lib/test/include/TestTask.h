@@ -4,7 +4,7 @@
 #include "thread/Task.h"
 #include <unistd.h>
 
-class TestNonBlockingTask: public cadf::thread::Task {
+class TestNonBlockingTask: public cadf::thread::ITask {
     public:
         TestNonBlockingTask();
         virtual ~TestNonBlockingTask() = default;

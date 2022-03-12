@@ -30,7 +30,7 @@ namespace cadf::thread {
     /**
      * Create a new thread with the specified Task.
      */
-    Thread::Thread(Task *executable): m_task(executable), m_alive(false) {
+    Thread::Thread(ITask *executable): m_task(executable), m_alive(false) {
         ThreadInterruptConfigurator::configure();
     }
 

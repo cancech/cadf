@@ -6,9 +6,9 @@
 #include <boost/test/unit_test.hpp>
 #include <thread>
 
-#include <thread/Task.h>
+#include "thread/Task.h"
 
-#include <TestTask.h>
+#include "TestTask.h"
 
 /**
  * Unit test for Looping Executables
