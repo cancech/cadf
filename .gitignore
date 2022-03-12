@@ -1,6 +1,7 @@
-/**/build/
-/**/.project
-/**/.cproject
-/**/.settings
-/**/*.swp
+build
+.project
+.cproject
+.settings
+.autotools
+*.swp
 tmp
