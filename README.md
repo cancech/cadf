@@ -8,10 +8,10 @@ This genesys of this framework was the realization that while there are many dev
 # Libraries
 The libaries contained within are as follows:
 
-* comms-lib - provides communications across local or distributed nodes
-* di-lib - provides dependency injection capabilities
-* dom-lib - provides DOM support
-* thread-lib - provides threading capabilities
+* [comms-lib](comms-lib) - provides communications across local or distributed nodes
+* [di-lib](di-lib) - provides dependency injection capabilities
+* [dom-lib](dom-lib) - provides DOM support
+* [thread-lib](thread-lib) - provides threading capabilities
 
 Details for each library can be viewed from within each.
 
