@@ -10,7 +10,7 @@
 namespace cadf::thread {
 
     /**
-     * Interface for the ThreadPool that the Threaded aspects of the CAMB will use.
+     * Interface for the ThreadPool that the Threaded aspects of the CADF will use.
      */
     class IThreadPool {
         public:
