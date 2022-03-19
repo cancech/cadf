@@ -1,4 +1,3 @@
-
 #define BOOST_TEST_DYN_LINK
 #ifdef STAND_ALONE
 #   define BOOST_TEST_MODULE Main
@@ -45,6 +44,21 @@ namespace ThreadTest {
             }
     };
 
+    struct TimedTest {
+            TimedTest() {
+                m_start = std::chrono::high_resolution_clock::now();
+            }
+
+            ~TimedTest() {
+                auto endTime = std::chrono::high_resolution_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::seconds>(endTime - m_start);
+                BOOST_CHECK_MESSAGE(duration.count() < 1, "Test took too long to complete");
+            }
+
+        private:
+            std::chrono::system_clock::time_point m_start;
+    };
+
 }
 
 /**
@@ -52,10 +66,10 @@ namespace ThreadTest {
  */
 BOOST_AUTO_TEST_SUITE(Thread_Test_Suite)
 
-    /**
-     * Verify that a single-shot (non-looping) thread performs as expected.
-     */
-    BOOST_AUTO_TEST_CASE(NonBlockingExecutableTest) {
+/**
+ * Verify that a single-shot (non-looping) thread performs as expected.
+ */
+    BOOST_FIXTURE_TEST_CASE(NonBlockingExecutableTest, ThreadTest::TimedTest) {
         TestNonBlockingTask executable;
         cadf::thread::Thread thread(&executable);
 
@@ -83,7 +97,7 @@ BOOST_AUTO_TEST_SUITE(Thread_Test_Suite)
     /**
      * Verify that a single-shot (non-looping) thread performs as expected.
      */
-    BOOST_AUTO_TEST_CASE(BlockingExecutableTest) {
+    BOOST_FIXTURE_TEST_CASE(BlockingExecutableTest, ThreadTest::TimedTest) {
         TestBlockingTask executable;
         cadf::thread::Thread thread(&executable);
 
@@ -111,7 +125,7 @@ BOOST_AUTO_TEST_SUITE(Thread_Test_Suite)
     /**
      * Verify that the thread performs as expected when executing a non-blocking looping task
      */
-    BOOST_AUTO_TEST_CASE(NonBlockingLoopingExecutableTest) {
+    BOOST_FIXTURE_TEST_CASE(NonBlockingLoopingExecutableTest, ThreadTest::TimedTest) {
         TestNonBlockingLoopingTask executable;
         cadf::thread::Thread thread(&executable);
 
@@ -145,7 +159,7 @@ BOOST_AUTO_TEST_SUITE(Thread_Test_Suite)
     /**
      * Verify that the thread performs as expected when executing a blocking looping task
      */
-    BOOST_AUTO_TEST_CASE(BlockingLoopingExecutableTest) {
+    BOOST_FIXTURE_TEST_CASE(BlockingLoopingExecutableTest, ThreadTest::TimedTest) {
         TestBlockingLoopingTask executable;
         cadf::thread::Thread thread(&executable);
 
@@ -168,7 +182,7 @@ BOOST_AUTO_TEST_SUITE(Thread_Test_Suite)
     /**
      * Verify that nothing happens when stopping a thread that hasn't been started yet.
      */
-    BOOST_AUTO_TEST_CASE(StopUnstartThreadTest) {
+    BOOST_FIXTURE_TEST_CASE(StopUnstartThreadTest, ThreadTest::TimedTest) {
         TestNonBlockingTask executable;
         cadf::thread::Thread thread(&executable);
 
@@ -189,7 +203,7 @@ BOOST_AUTO_TEST_SUITE(Thread_Test_Suite)
     /**
      * Verify that nothing happens when starting a thread that's already started
      */
-    BOOST_AUTO_TEST_CASE(StartStartedThreadTest) {
+    BOOST_FIXTURE_TEST_CASE(StartStartedThreadTest, ThreadTest::TimedTest) {
         TestBlockingTask executable;
         cadf::thread::Thread thread(&executable);
 
@@ -224,7 +238,7 @@ BOOST_AUTO_TEST_SUITE(Thread_Test_Suite)
     /**
      * Verify that nothing happens when starting a thread that's already started
      */
-    BOOST_AUTO_TEST_CASE(StartThreadNotYetJoinedTest) {
+    BOOST_FIXTURE_TEST_CASE(StartThreadNotYetJoinedTest, ThreadTest::TimedTest) {
         TestNonBlockingTask executable;
         cadf::thread::Thread thread(&executable);
 
@@ -261,7 +275,7 @@ BOOST_AUTO_TEST_SUITE(Thread_Test_Suite)
     /**
      * Verify the destructor terminates the thread properly/
      */
-    BOOST_AUTO_TEST_CASE(DestructorStopsThreadTest) {
+    BOOST_FIXTURE_TEST_CASE(DestructorStopsThreadTest, ThreadTest::TimedTest) {
         TestBlockingTask executable;
         cadf::thread::Thread *thread = new cadf::thread::Thread(&executable);
 
@@ -279,7 +293,7 @@ BOOST_AUTO_TEST_SUITE(Thread_Test_Suite)
         BOOST_CHECK(thread->isAlive());
 
         // Make sure that deleting the thread also stops it
-        delete(thread);
+        delete (thread);
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         BOOST_CHECK_EQUAL(1, executable.timesExecCalled());
         BOOST_CHECK_EQUAL(1, executable.timesScheduleStopCalled());
@@ -288,7 +302,7 @@ BOOST_AUTO_TEST_SUITE(Thread_Test_Suite)
     /**
      * Verify an exception is throw when starting a thread with a NULL task.
      */
-    BOOST_AUTO_TEST_CASE(NullTaskTest) {
+    BOOST_FIXTURE_TEST_CASE(NullTaskTest, ThreadTest::TimedTest) {
         cadf::thread::Thread thread(NULL);
         BOOST_CHECK(!thread.isAlive());
         BOOST_CHECK_THROW(thread.start(), cadf::thread::ThreadInitializationException);
@@ -298,7 +312,7 @@ BOOST_AUTO_TEST_SUITE(Thread_Test_Suite)
     /**
      * Verify that a oneshot task will properly terminate itself once it completes
      */
-    BOOST_AUTO_TEST_CASE(OneShotRunsCourseTest) {
+    BOOST_FIXTURE_TEST_CASE(OneShotRunsCourseTest, ThreadTest::TimedTest) {
         ThreadTest::TestOneShotThread thread;
         BOOST_CHECK(!thread.isAlive());
         thread.start();
@@ -315,7 +329,7 @@ BOOST_AUTO_TEST_SUITE(Thread_Test_Suite)
     /**
      * Verify that a oneshot task will properly stop when stopped
      */
-    BOOST_AUTO_TEST_CASE(OneShotStopThreadTest) {
+    BOOST_FIXTURE_TEST_CASE(OneShotStopThreadTest, ThreadTest::TimedTest) {
         ThreadTest::TestOneShotThread thread;
         BOOST_CHECK(!thread.isAlive());
         thread.start();
@@ -330,7 +344,7 @@ BOOST_AUTO_TEST_SUITE(Thread_Test_Suite)
     /**
      * Verify that a looping thread can be properly started and stopped
      */
-    BOOST_AUTO_TEST_CASE(LoopingThreaddTest) {
+    BOOST_FIXTURE_TEST_CASE(LoopingThreaddTest, ThreadTest::TimedTest) {
         ThreadTest::TestLoopingThread thread;
         BOOST_CHECK(!thread.isAlive());
         thread.start();

@@ -30,7 +30,7 @@ namespace cadf::thread {
     /**
      * Create a new thread with the specified Task.
      */
-    Thread::Thread(ITask *executable): m_task(executable), m_alive(false) {
+    Thread::Thread(Task *executable): m_task(executable), m_alive(false) {
         ThreadInterruptConfigurator::configure();
     }
 
@@ -75,6 +75,7 @@ namespace cadf::thread {
 
         m_task->scheduleStop();
         pthread_kill(m_thread.native_handle(), ThreadInterruptConfigurator::INTERRUPT_SIGNAL);
+        std::raise(ThreadInterruptConfigurator::INTERRUPT_SIGNAL);
         if (m_thread.joinable())
             m_thread.join();
     }

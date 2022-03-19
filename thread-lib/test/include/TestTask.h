@@ -2,9 +2,8 @@
 #define INCLUDE_TESTTASK_H_
 
 #include "thread/Task.h"
-#include <unistd.h>
 
-class TestNonBlockingTask: public cadf::thread::ITask {
+class TestNonBlockingTask: public cadf::thread::Task {
     public:
         TestNonBlockingTask();
         virtual ~TestNonBlockingTask() = default;

@@ -25,7 +25,7 @@ TestBlockingTask::TestBlockingTask(): TestNonBlockingTask() {
 
 void TestBlockingTask::exec() {
     TestNonBlockingTask::exec();
-    sleep(10);
+    ssleep(10);
 }
 
 
@@ -43,7 +43,7 @@ TestBlockingLoopingTask::TestBlockingLoopingTask(): m_called(false) {}
 
 void TestBlockingLoopingTask::execLoop() {
     m_called = true;
-    sleep(10);
+    ssleep(10);
 }
 
 bool TestBlockingLoopingTask::wasCalled() {

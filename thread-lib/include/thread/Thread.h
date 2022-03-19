@@ -44,9 +44,9 @@ namespace cadf::thread {
              *
              * Creates a new thread in which the specified task will be executed.
              *
-             * @param *task ITask to be executed within the thread.
+             * @param *task Task to be executed within the thread.
              */
-            Thread(ITask *task);
+            Thread(Task *task);
 
             /**
              * DTOR
@@ -74,7 +74,7 @@ namespace cadf::thread {
 
         private:
             /** The task to execute within this thread */
-            ITask *m_task;
+            Task *m_task;
             /** Flag for whether or not the task is executing */
             std::atomic<bool> m_alive;
             /** The thread in which the task will actually execute */
@@ -86,7 +86,7 @@ namespace cadf::thread {
      * Abstract thread where the thread object also acts as the Task. The child class must provide the actual logic, as well as the necessary mechanism
      * for stopping aborting the execution (as per Task).
      */
-    class OneShotThread: public Thread, public ITask {
+    class OneShotThread: public Thread, public Task {
         public:
             /**
              * CTOR
