@@ -23,15 +23,15 @@ namespace cadf::dom::json {
         size_t mySize = 0;
 
         if(node.isArray()) {
-            mySize = 2 + node.numArrayElements() - 1;
+            mySize = node.numArrayElements() + 1;
             for(DomNode::ArrayIterator it = node.beginArray(); it != node.endArray(); ++it)
                 mySize += size(*it);
         } else if (node.isLeaf()) {
             mySize = getValueString(node).size();
         } else {
-            mySize = 2 + node.numChildren() - 1;
+            mySize = node.numChildren() + 1;
             for(DomNode::ChildIterator it = node.beginChildren(); it != node.endChildren(); ++it)
-                mySize += it->first.size() + 2 + 1 + size(it->second);
+                mySize += it->first.size() + 3 + size(it->second);
         }
 
         return mySize;
