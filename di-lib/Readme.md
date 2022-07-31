@@ -401,3 +401,93 @@ context.assemble();
 // Retrieve the vector from the context
 context.getBean<std::vector<int>>("allInts");
 ```
+
+# Under the Hood
+
+The core architecture centres around a map (repository) in [BeanManager](include/di/BeanManager.h) where all registered beans are stored. The key to the map is the bean name (under which the bean is registered), however the value is not the bean itself. At least not directly. Instead there are some layers of abstraction in place to ensure a uniform and simple means of accessing the beans. 
+
+## Provider Classes
+
+There are a series of `Provider` classes (defined in [BeanProvider.h](include/di/BeanProvider.h)), which are responsible for the abstraction and mechanism of storing and accessing the beans themselves.
+
+### BaseProvider
+
+The repository (bean map) contains an instance of `BaseProvider`, the top most parent of the `Provider` classes, which is a pure virtual class (interface). The purpose of `BaseProvider` is be the anchor of the concrete `Provider` class that can be stored in the repository. The concrete `Provider` classes are template classes, and multiple template classes of different types cannot be stored in the same map in C++. Or to put it a different way, the map must define which exact type of the template class it can store within itself. There is no "any" template wildcard that other languages such as Java allow. As the `BaseProvider`'s role is to act purely as a placeholder, there is little to no functionality available to it. In fact the only member function it provides the the `getType()` which is a pure virtual member function to retrieve the name of the type of the bean stored within as a plain string for error reporting and debugging purposes.
+
+### TypeProvider
+
+As the first subclass of the `BaseProvider`, the `TypeProvider`'s role is to manage and account for the type of the bean. It is a template class whose type corresponds to the type of the bean. The ultimate role of the `TypeProvider` is to track the type of the bean, but to abstract where the bean comes from or how it is created. In a perfect world the `getBean()` member function would be pure virtual, however C++ does not allow for virtual template member functions. To get around this limitation `getBean()` is fully implemented in `TypeProvider` but it relies on the concrete subclass to provide the bean instance through the pure virtual `provideBean()` member function that the concrete provider must implement. `provideBean()` is then called from within `getBean()` with the expectation that it will populate the `m_beanWrapper` as a `new`, after which `getBean()` retrieves the bean itself and cleans up the temporary memory `m_beanWrapper`.
+
+### BeanCreatorProvider
+
+This is a concrete Provider which relies on a template `Creator` class to determine how the beans are to be created/managed. It does virtually nothing, other than associate `TypeProvider::m_beanWrapper` with the `Creator`. The `BeanCreatorProvider` can work with any `Creator`, so long as the `Creator` matches the appropriate qualifications:
+
+* The `Creator` has a default constructor.
+* The `Creator` has a public no argument `create()` member function.
+* The `Creator::create()` member function returns the bean instance as a `ValueWrapper<T>*` allocated via new.
+
+### BeanInstanceProvider
+
+This is a concrete Provider which provides the specific instance it was created with. It always provides the same instance, meaning:
+
+* Pointers are effectively singleton.
+* References are effectively singleton.
+* Scalars are, as per the scalar norm, effectively factories.
+
+### ValueWrapper
+
+The ValueWrapper is a supporting class, whose purpose is to act as the middleman between the concrete `Provider` and the `TypeProvider`, ensuring that the exact same instance that the `Provider` or `Creator` wanted to provide is what the `TypeProvider` received. Issues were encountered with references becoming scalar at some point along the way in the translation (i.e.: rather than being a reference to the original instance it became its own instance). The `ValueWrapper` ensures that this does not happen. It is an extremely simple struct, designed to server this exact purpose only.
+
+## BeanManager
+
+The `BeanManager` is at the core of DI functionality, as it tracks all of the beans and allows for them to be added and retrieved. It is here that the `Providers` explained above are put into use. 
+
+### Bean Registration
+
+When a bean is registered, depending on how it was registered a concrete provider will be created for it.
+
+* `registerBean()` will create a `BeanCreatorProvider` using whichever `Creator` the client code specifies (defaulting to `SingletonBeanCreator` if no default was specified)
+* `registerBeanInstance()` will create a `BeanInstanceProvider` using whichever instance was specified.
+
+If the bean can be added (a series of checks are performed to ensure no duplicate beans and the like), the created concrete `Provider` is then added to the repository under the specified bean name.
+
+### Bean Retrieval
+
+The retrieval of beans is slightly more complex, however ultimately still straight forward. Regardless of how the bean was registered, or what concrete `Provider` it has, the same mechanism for retrieval is employed. Before anything else can be done, a quick check is performed to ensure that the bean request is in fact already registered. If it isn't, if Bean Autoregistration is enabled it is registered using the default `Creator`, or an exception is thrown.
+
+The act of retrieving the bean itself is about what one can expect, get the appropriate `Provider` from the repository, get the bean from it, and return it. The only extra comes in the form of `m_beanNameStack` which is in place to allow for cycle dependency checking. It is possible that attempting to create one bean will cause it to attempt to retrieve another bean, and so on, meaning that it is entirely possible for a cycle to exist where a bean will inadvertently be dependent on itself (i.e.: beanA requires beanB, which requires beanC, which required beanA). The cycle check will determine when this happens, throwing an exception indicating where the cycle exists.
+
+## Configuration
+
+Where `BeanManager` is the core, the `Configuration` is the cornerstone. The expectation is that the client code will never touch upon the `BeanManager` directly, but rather perform all bean processing by means of `Configuration` classes. These classes allow the client to retrieve beans as resources and provide new beans in turn. The `Configuration` manages any/all resources it requires as private members, meaning that the `Configuration` cannot be instantiated until all required resources are available. To facilitate with this process a `ConfigurationWrapper` is created for each `Configuration` when it is registered.
+
+### ConfigurationWrapper
+
+As the name implies, the `ConfigurationWrapper` is a wrapper class for the `Configuration`. Since the `Configuration` itself cannot be initialised until after all required resources are available in the `BeanManager`, the `ConfigurationWrapper` is used to track what resources the `Configuration` is waiting on. The `Configuration` provides a list of resources it requires via the static `getResourceNames()` member function, the `ConfigurationWrapper` stores all of these names as `m_waitingResources` and during each `areResourcesSatisfied()` check determines which of the waiting resources have become available. Once `m_waitingResources` has been depleted, the `Configuration` has all of its resources fulfilled, and it can be initialised. This is the main duty of the `ConfigurationWrapper`, however it acts as an intermediary for the uninitialised `Configuration` in order debug related means. Ultimately until the `Configuration` itself has been initialised, the `ConfigurationWrapper` is the only way through which to retrieve any information about the `Configuration`. In this manner it can be considered to act as the metadata for the uninitialised `Configuration`.
+
+### ConfigurationWrapperInterface
+
+The `ConfigurationWrapper` is a template class, with the template being the `Configuration` class that it is wrapping. As per what was described in the `Provider` section above, there is no "any" template wildcard, meaning that for the `Context` to track the `ConfigurationWrapper` it must know what exact type the template is. This makes dealing with `ConfigurationWrappers` in a uniform or simple manner impossible, which is where the `ConfigurationWrapperInterface` comes in. It is a pure virtual class, that provides as pure virtual member functions all of the necessary features that the `Context` requires to interact fully with the `ConfigurationWrapper`, without needing to rely on the `Configuration` class type. Thus `ConfigurationWrapperInterface` is what the `Context` will primarily see.
+
+## Context
+
+Where `BeanManager` is the core, and `Configuration` is the cornerstone, the `Context` is the glue that holds everything together. It is the `Context` that manages `Configurations`, and that provides the `BeanManager` that the `Configurations` use. In that respect it has a singular purpose: take in any number of `Configurations` and process them. Registering a `Configuration` will create the `ConfigurationWrapper` for it (and all of its dependent `Configurations`) and when all have been registered via `assemble()` it will attempt to initialise all registered `Configurations`.
+
+### Assemble Configuration
+
+The process of assembling the `Context` is ultimately rather straight forward. It continuously iterates across all of the `Configurations` until a point is reached where no `Configuration` is loaded. This can occur in one of two situations:
+
+* All `Configurations` has been loaded - SUCCESS!!
+* All remaining `Configurations` have unfulfilled resources - FAILURE!!
+
+If successful, this means that the `Context` is sane, and the application can proceed forward with its purpose. If there are unfulfilled resources, that means that not all `Configurations` have been able to retrieve their necessary resources, which means either a resource is missing from the `Context`, or a dependency cycle exists between one or more `Configurations`. The `verifyContext()` will determine which is it, making use of the `CircularDependencyChecker` to find any cycles.
+
+### CircularDependencyChecker
+
+The `CircularDependencyChecker` is populated with the details of all of the `Configurations` that are as of yet waiting to be resolved. Namely:
+
+* The name of the configuration (for reporting and tracking purposes)
+* The list of resources it is still waiting on
+* The list of beans that it provides
+
+all of which is retrieved from the `ConfigurationWrapperInterface` of the pending `Configurations`. To determine whether a cycle is in place, the `CircularDependencyChecker` iterates across each `Configuration` and follows each of its resources. If it determines that it has previously visited the `Configuration`, a cycle exists and the details of the cycle are reported.
