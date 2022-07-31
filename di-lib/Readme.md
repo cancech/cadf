@@ -1,0 +1,8 @@
+# di-lib: Dependency Injection Library
+
+A comprehensive library to facilitate Dependency Injection: the sharing of object instances (beans) across an application in an efficient and straight forward manner. All efforts have been made to minimize the amount of client code (repetitive, boiler plate, or otherwise) required in order to allow bean sharing to take place. It is loosely modelled on the approach taken by Spring for Java, with a breakdown as follows:
+
+* Beans are tracked within a [BeanManager](di/BeanManager.h). This associates an instance or a creator (more or this later) to a bean name, and the bean can then be extracted via its name. In this respect the [BeanManager](di/BeanManager.h) is at the core of the CORM.
+* [Configuration](di/Configuration.h) classes are to be used to facilitate access to the [BeanManager](di/BeanManager.h). Each Configuration class can pull beans from the BeanManager (resources) and provides beans back into it. Each individual Configuration can only be created when all if its required resources are available within the BeanManager, as the resources are treated as private members within the Configuration class. After instantiation the Configuration must be initialised, during which time any/all beans it is to provide are created as passed into the BeanManager.
+* A single BeanManager and any number of Configuration classes are then contained within a single Context. The Context is responsible for assembling the Configurations and ultimately responsible for the life-cycle of the Configuration and beans within.
+* An application can have one or more Contexts, and as each Context will have its own BeanManager, each will be independent from one another.
