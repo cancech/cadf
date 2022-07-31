@@ -7,7 +7,6 @@
 #include "comms/message/Message.h"
 #include "comms/message/MessageFactory.h"
 #include "dom/DomConverter.h"
-#include "dom/JsonConverter.h"
 
 namespace cadf::comms::dom {
 

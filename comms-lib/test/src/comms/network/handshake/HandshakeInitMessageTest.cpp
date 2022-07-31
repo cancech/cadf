@@ -8,7 +8,7 @@
 
 #include "comms/network/handshake/HandshakeInitMessage.h"
 #include "comms/network/serializer/binary/Serializer.h"
-#include "comms/network/serializer/dom/BaseSerializer.h"
+#include "comms/network/serializer/dom/JsonSerializer.h"
 
 /**
  * Ensure the correct functionality of the HandshakeInitMessage

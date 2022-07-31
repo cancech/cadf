@@ -5,7 +5,7 @@
 #endif
 #include <boost/test/unit_test.hpp>
 
-#include "dom/JsonConverter.h"
+#include "dom/json/JsonConverter.h"
 
 BOOST_AUTO_TEST_SUITE(Json_Test_Suite)
 

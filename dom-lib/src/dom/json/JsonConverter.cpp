@@ -1,5 +1,5 @@
-#include "dom/JsonConverter.h"
-#include "dom/JsonParser.h"
+#include "dom/json/JsonConverter.h"
+#include "dom/json/JsonParser.h"
 
 namespace cadf::dom::json {
 

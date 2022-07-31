@@ -2,6 +2,7 @@
 #define COMMS_NETWORK_SERIALIZER_DOM_JSONSERIALIZER_H_
 
 #include "comms/network/serializer/dom/BaseSerializer.h"
+#include "dom/json/JsonConverter.h"
 
 namespace cadf::comms::dom::json {
 

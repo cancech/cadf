@@ -1,4 +1,4 @@
-#include "dom/JsonParser.h"
+#include "dom/json/JsonParser.h"
 #include "dom/DomException.h"
 
 namespace cadf::dom::json {
