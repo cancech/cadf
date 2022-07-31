@@ -4,12 +4,40 @@ A comprehensive library to facilitate Dependency Injection: the sharing of objec
 
 * Beans are tracked within a [BeanManager](include/di/BeanManager.h). This associates an instance or a creator (more or this later) to a bean name, and the bean can then be extracted via its name. In this respect the [BeanManager](include/di/BeanManager.h) is at the core of the dependency injection.
 * [Configuration](include/di/Configuration.h) classes are to be used to facilitate access to the [BeanManager](include/di/BeanManager.h). Each [Configuration](include/di/Configuration.h) class can pull beans from the [BeanManager](include/di/BeanManager.h) (as resources) and provides beans back into it. Each individual [Configuration](include/di/Configuration.h) can only be created when all of its required resources are available within the [BeanManager](include/di/BeanManager.h), as the resources are treated as private members within the [Configuration](include/di/Configuration.h) class. After instantiation the [Configuration](include/di/Configuration.h) must be initialised, during which time any/all beans it is to provide are created and passed into the [BeanManager](include/di/BeanManager.h).
-* A single [BeanManager](include/di/BeanManager.h) and any number of [Configuration](include/di/Configuration.h) classes are then contained within a single [Context](include/di/Context.h). The [Context](include/di/Context.h) is responsible for assembling the [Configuration](include/di/Configuration.h)s and ultimately responsible for the life-cycle of the [Configuration](include/di/Configuration.h) and beans within.
-* An application can have one or more [Context](include/di/Context.h)s, and as each Context will have its own [BeanManager](include/di/BeanManager.h), each will be independent from one another.
+* A single [BeanManager](include/di/BeanManager.h) and any number of [Configuration](include/di/Configuration.h) classes are then contained within a single [Context](include/di/Context.h). The [Context](include/di/Context.h) is responsible for assembling the [Configurations](include/di/Configuration.h) and ultimately responsible for the life-cycle of the [Configuration](include/di/Configuration.h) and beans within.
+* An application can have one or more [Contexts](include/di/Context.h), and as each Context will have its own [BeanManager](include/di/BeanManager.h), each will be independent from one another.
+
+# Context
+
+The [Context](include/di/Context.h) can be viewed as a sandbox within which beans can be shared by means of a [BeanManager](include/di/BeanManager.h) dedicated to the [Context](include/di/Context.h). There is no manner through which to share beans between [Contexts](include/di/Context.h) directly, therefore custom bridging code will have to be provided in order to facilitate that form of sharing.
+
+## Creating a Context
+
+Creating a new [Context](include/di/Context.h) is as simple as creating an instance of the [Context](include/di/Context.h) class. The [Context](include/di/Context.h) will create the [BeanManager](include/di/BeanManager.h) instance for itself, and allow the registration of [Configuration](include/di/Configuration.h) classes. Once all of the desired [Configurations](include/di/Configuration.h) are registered, the [Context](include/di/Context.h) must be assembled at which time it will attempt to create and initialise all registered [Configurations](include/di/Configuration.h). If there is an issue encountered during the assembly (primarily missing resource, type mismatch, or circular dependency between [Configurations](include/di/Configuration.h)) an exception will be thrown indicating where and why assembling the [Context](include/di/Context.h) failed.
+
+```C++
+cadf::di::Context sampleContext;
+sampleContext.registerConfiguration<Config1, Config2, Config3>();
+sampleContext.registerConfiguration<Config4>();
+sampleContext.assemble();
+```
+Note that the [Configuration](include/di/Configuration.h) class instances are not passed into the [Context](include/di/Context.h) (their creation would most likely fail due to missing resources at this stage), but rather their type is passed through the template. Any number of [Configuration](include/di/Configuration.h) class types can be passed in to a single call to `registerConfiguration` (minimum one).
+
+## Destroying a Context
+
+The life-cycle of the context is tied to the life-cycle of the [Context](include/di/Context.h) class. Once that instance is destroyed, all of the registered [Configurations](include/di/Configuration.h) will be destroyed, and any beans which are managed by the [BeanManager](include/di/BeanManager.h) will be destroyed as well.
+
+## Managing Beans Across Contexts
+
+There may be times when it becomes necessary to combine beans that are either shared across different [Contexts](include/di/Context.h), or beans that live outside of any given single [Context](include/di/Context.h). To account for these situations the [Context](include/di/Context.h) class has the ability to register beans directly (inject a bean from outside the context), or to extract beans from within a [Context](include/di/Context.h) to be used outside of it. To facilitate both of these situations, the [Context](include/di/Context.h) actually extends the [BeanManager](include/di/BeanManager.h) allowing for direct access to beans already registered within the [Context](include/di/Context.h) (via `BeanManager::getBean<Type>("name")`), or to manually register one-off beans using either [Creators](include/di/BeanCreator.h) or an existing instance. Note that the bean life-cycle rules do not change for beans that are registered or retrieved in this manner. Meaning:
+
+* Any bean retrieved from a [Context](include/di/Context.h) will be subject to the life-cycle of the [Context](include/di/Context.h) from which it came (as per the subsequent points)
+* Destruction of a [Context](include/di/Context.h) will in turn destroy all registered [Creators](include/di/BeanCreator.h), with each [Creator](include/di/BeanCreator.h) determining how to manage any memory it allocates (i.e.: `cadf::di::SingletonBeanCreator` will destroy the instance, whereas `cadf::di::FactoryBeanCreator` leaves the memory management to the client)
+* Any instances registered with the [Context](include/di/Context.h) are not handled at all, and it is expected that whomever created the instance will then bear the responsibility for managing its life-cycle.
 
 # BeanManager
 
-As mentioned, the [BeanManager](include/di/BeanManager.h) is responsible for managing the specific beans within the [Context](include/di/Context.h). The [Configuration](include/di/Configuration.h)s will pull resources from it, push beans into it, and through this allow for instances of classes or types to be easily passed around the application. To push a bean into the [BeanManager](include/di/BeanManager.h) it must be registered, and registering the bean can be done in one of two ways:
+As mentioned, the [BeanManager](include/di/BeanManager.h) is responsible for managing the specific beans within the [Context](include/di/Context.h). The [Configurations](include/di/Configuration.h) will pull resources from it, push beans into it, and through this allow for instances of classes or types to be easily passed around the application. To push a bean into the [BeanManager](include/di/BeanManager.h) it must be registered, and registering the bean can be done in one of two ways:
 
 * Instance
 * Creator
