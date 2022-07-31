@@ -325,3 +325,79 @@ private:
 
 END_CONFIGURATION
 ```
+
+# Example
+
+To show how this all comes together a few [Configurations](include/di/Configuration.h) files and a [Context](include/di/Context.h) will be included as a contrived example. So to start with, we need some [Configurations](include/di/Configuration.h)
+
+Configuration1: provides some ints. Note that this does not require any resources so the RESOURCES macro is absent
+```C++
+// Config which requires a single resource from ProviderManagerTestConfig and provides a single bean
+CONFIGURATION(Configuration1)
+
+	BEANS(
+		(BEAN, int, Example123Creator, "int1"),
+		(BEAN_INSTANCE, int, "int2", 456),
+		(BEAN_INSTANCE, int, "int3", 789)
+	)
+
+END_CONFIGURATION
+```
+
+Configuration2: takes ints to create a vector
+```C++
+// Config which requires three resources (provided by Configuration1) and provides a single bean
+CONFIGURATION(Configuration2)
+
+private:
+	std::vector<int> allInts;
+
+protected:
+	void postInit() {
+		// Called during initialization after resource are available
+		allInts.push_back(int1);
+		allInts.push_back(int2);
+		allInts.push_back(int3);
+	}
+
+	BEANS(
+		(BEAN_INSTANCE, std::vector<int>&, allInts)
+	)
+
+	RESOURCES(
+		(int, int1),
+		(int, int2),
+		(int, int3)
+	)
+
+END_CONFIGURATION
+```
+
+Configuration3: specifies Configuration1 and Configuation2 as dependencies, and adds some more ints to the vector
+```C++
+CONFIGURATION(Configuration3)
+
+DEPENDENCIES(Configuration1, Configuation2)
+
+protected:
+	void postInit() {
+		m_allInts.push_back(13579);
+		m_allInts.push_back(24680);
+	}
+
+	RESOURCES(
+		(std::vector<int>&, "allInts", m_allInts)
+	)
+	
+END_CONFIGURATION
+```
+
+Create a context which loads the above three Configurations
+```C++
+cadf::di::Context context;
+context.registerConfiguration<Configuration3>();
+context.assemble();
+
+// Retrieve the vector from the context
+context.getBean<std::vector<int>>("allInts");
+```
