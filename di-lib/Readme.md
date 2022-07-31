@@ -104,3 +104,216 @@ BEANS(
 As the description of the Bean Creator indicates, the provided Creators only work with beans that provide a default constructor. This limitation does allow for an extra piece of flexibility, specifically that it does not truly matter if a bean was registered prior to asking for it so long as it can be created by one of these provided Creators. If the bean in question can be created without any extra information, it is possible for it to be registered and created at the time of asking for it. This functionality is disabled by default, however this form of auto-registration can be enabled at compile time via `ENABLE_BEAN_AUTOREGISTRATION`. When this flag is defined, when the BeanManager is asked to retrieve a bean which has not been registered yet, it will be registered at that time with a [cadf::di::SingletonBeanCreator](include/di/BeanCreator.h).
 
 Note that `ENABLE_BEAN_AUTOREGISTRATION` is Header Only, meaning that the library itself need not be recompiled in order to change this behaviour.
+
+# Configuration
+
+The [Configuration](include/di/Configuration.h) class can be seen as a recipe. It will require some resources (inputs) and then provide some beans (outputs)
+
+## Defining a Configuration
+
+In order for a [Configuration](include/di/Configuration.h) to be usable within a [Context](include/di/Context.h), it must:
+
+* Extend the `cadf::di::Configuration` class.
+* Provide a constructor that matches the exact signature of the base `cadf::di::Configuration` constructor.
+* Override the getName() static member function to return a plain text name of the [Configuration](include/di/Configuration.h) class. _(1)_
+* Override the getResourceNamess() static member function to return a complete list of names of all resources the [Configuration](include/di/Configuration.h) requires. _(1)_
+* Override the getBeanNames() static member function to return a complete list of all beans the [Configuration](include/di/Configuration.h) will provide. _(1)_
+
+_(1) Strickly speaking these are not required to compile or for core functionality, however they are required for error checking and debug._
+
+### Configuration Macros
+
+A series of Macros are available to facility the definition and creation of [Configuration](include/di/Configuration.h) classes. It is highly recommended to make use of these to simplify the process of creating new [Configurations](include/di/Configuration.h), and to avoid repetitive or boiler plate code. This should also maximise future proofing and decrease the amount of rework required as future updates are released.
+
+#### CONFIGURATION Macro
+
+```C++
+CONFIGURATION(ExampleConfiguration)
+```
+This Macro marks the start of a [Configuration](include/di/Configuration.h) class. It will provide the start of the class definition, and provide an implementation of the static getName() member function. The example above will generate the following:
+
+```C++
+class ExampleConfiguration: public cadf::di::BaseConfiguration { \
+	public: \
+		ConsumerManagerTestConfig(cadf::di::BeanManager* manager): BaseConfiguration(manager) {} \
+		static std::string getName() { return "ExampleConfiguration"; }
+```
+
+#### DEPENDENCIES Macro
+
+```c++
+DEPENDENCIES(SubConfiguration1, SubConfiguration2, SubConfiguration3)
+```
+
+A [Configuration](include/di/Configuration.h) can have dependent [Configurations](include/di/Configuration.h), which will also be registered within the [Context](include/di/Context.h). This allows for easy module management, where a root [Configuration](include/di/Configuration.h) for a module can be defined and this will then list dependencies of any/all [Configuration](include/di/Configuration.h) required for the module to function. In this manner the whole module can be registered with a [Context](include/di/Context.h) by simply registering the core [Configuration](include/di/Configuration.h). Dependencies of dependencies will also be registered.
+
+Note that when using this Macro at least one dependent [Configuration](include/di/Configuration.h) must be present, and it will support up to 256 dependent [Configuration](include/di/Configuration.h). If more than 256 dependent Configurations are required for a single [Configuration](include/di/Configuration.h), it must be broken into nested layers of dependencies (top most [Configuration](include/di/Configuration.h) can have up to 256 dependencies, each of which can have up to 256 dependencies, each of those can have an additional 256 dependencies,... ad nausea).
+
+This Macro will ultimately provide an implementation of the static `getDependentConfigurations()` member function, and generate code which looks like the following:
+
+```C++
+static std::vector<corm::ConfigurationWrapperInterface*> getDependentConfigurations(cadf::di::BeanManager* manager) { \
+		std::vector<cadf::di::ConfigurationWrapperInterface*> deps; \
+		deps.push_back(new cadf::di::ConfigurationWrapper<SubConfiguration1>(manager)); \
+		deps.push_back(new cadf::di::ConfigurationWrapper<SubConfiguration2>(manager)); \
+		deps.push_back(new cadf::di::ConfigurationWrapper<SubConfiguration3>(manager)); \
+		return deps; \
+}
+```
+
+#### BEANS Macro
+
+```C++
+  BEANS(
+    (BEAN, SomeClass&, "someClassBean"),
+    (BEAN_INSTANCE, CustomClass*, instance)
+  )
+ ```
+ This Macro is available to shorthand the process of registering beans with the [BeanManager](include/di/BeanManager.h), as well as providing an implementation for the static `getBeanNames()` member function. Each bean to be registered must be contained within a set of brackets, however there is some flexibility in terms of what and how the beans are registered. The first parameter for each bean is the Bean Type:
+ 
+ * BEAN indicates a bean which is to be managed via a [Bean Creator](include/di/BeanCreator.h)
+ * BEAN_INSTANCE indicates registering a member within the [Configuration](include/di/Configuration.h) as an instance
+ 
+ For BEAN the remaining parameters are as follows:
+ 
+ * Type - indicating the type which is to be registered
+ * Creator - Optionally indicating the type of Creator to use for the bean. If not present it will default to `cadf::di::SingletonBeanCreator`
+ * Bean Name - under what name the bean should be registered
+ 
+ For BEAN_INSTANCE the remaining parameters are as follows:
+ 
+ * Type - indicating the type which is to be registered
+ * Bean Name - Optionally indicating what name to register the instance under. If not present, it will default to the variable name of the instance (in the above example the bean name will be "instance")
+ * Instance - the specific instance which is to be registered as a bean
+ 
+ Note that for BEAN_INSTANCE the Instance can be any instance of the desired type. This could be a reference to a member variable (as per the example), or creating the instance when registering. For example
+
+```C++
+  BEANS(
+    (BEAN_INSTANCE, int, "someint", 123),
+    (BEAN_INSTANCE, int, "somestring", "This is a String"),
+    (BEAN_INSTANCE, SomeClass, "someclass", new SomeClass(1, 2, 3))
+  )
+```
+are all valid, though note the possible memory leak on the someclass bean instance.
+
+The original example of
+
+```C++
+  BEANS(
+    (BEAN, SomeClass&, "someClassBean"),
+    (BEAN_INSTANCE, CustomClass*, instance)
+  )
+```
+will generate code which looks as follows
+
+```C++
+protected: \
+	void provideBeans() { \
+		m_beanManager->registerBean<SomeClass&>("someClassBean"); \
+		m_beanManager->registerBeanInstance<CustomClass*>("instance", instance); \
+	} \
+public: \
+	static const std::vector<std::string>& getBeanNames() { \
+		static std::vector<std::string> beanNames { \
+			"someClassBean", \
+			"instance", \
+		}; \
+		return beanNames; \
+	}
+```
+
+Note that up to 256 beans can be registered in a single Configuration through the means indicated here.
+
+#### RESOURCES Macro
+
+```C++
+  RESOURCES(
+    (int, intbean),
+    (std::string&, "beanName", stringBean),
+    (SampleClass*, sampleClassInstance)
+  )
+```
+This Macro will shorthand the process of registering resource dependencies, as well as the static `getResourceNames()` member function. Much like the BEANS Marco each required resource must be contained within a set of brackets, and the values provided for each resource are as follows:
+
+* Type - indicating what type of resource is expected to be retrieved from the [BeanManager](include/di/BeanManager.h)
+* Bean Name - Optionally indicating the name of the bean to retrieve. If not present the bean name is derived from the variable name.
+* Variable Name - name of the variable where the bean is to be stored
+
+This will create all of the specified resources as members within the Configuration and load each of them from the [BeanManager](include/di/BeanManager.h). The example will generate the following code:
+
+```C++
+private: \
+	int  intbean = m_beanManager->getBean<int>("intbean"); \
+	std::string&  stringBean = m_beanManager->getBean<std::string&>("beanName"); \
+	SampleClass*  sampleClassInstance = m_beanManager->getBean<SampleClass*>("sampleClassInstance"); \
+public: \
+	static const std::vector<std::string>& getResourceNames() { \
+		static std::vector<std::string> resourceNames { \
+			"intbean", \
+			"beanName", \
+			"sampleClassInstance" \
+		}; \
+		return resourceNames; \
+	}
+```
+Note that up to 256 resources can be specified in a single Configuration in the manner as shown here.
+
+#### END_CONFIGURATION Macro
+
+```C++
+END_CONFIGURATION
+```
+This Macro is present to maintain the symmetry of the Configuration definition, and it merely places an end to the class. Meaning that it just simply converts to 
+```C++
+};
+```
+## Example Configuration
+
+The following is the complete Configuration as described above.
+
+```c++
+/*
+ * Create a new configuration via the CONFIGURATION macro. The parameter passed to it (ExampleConfiguration in this case)
+ * is the name of this Configuration class, and what will later be registered witin a Context.
+ */
+CONFIGURATION(ExampleConfiguration)
+
+  // Include dependent Configurations of this Configuration (more details below)
+  DEPENDENCIES(SubConfiguration1, SubConfiguration2, SubConfiguration3)
+
+public:
+  ~ExampleConfiguration() {
+    // The Configuration is responsible for managing any memory it allocates
+    delete(instance);
+  }
+
+protected:
+
+  /*
+   * postInit is called during the initialization process of the Configuration. It is here that any processing
+   * of resources should take place. The processing need not result in any beans, but this is where any bean
+   * instances which are to be then shared are to be initialized.
+   */
+  void postInit() {
+    instance = new CustomClass(intBean, stringBean, sampleClassInstance);  
+  }
+  
+  // Through the BEANS Macro indicate what beans are to be provided (more details below)
+  BEANS(
+    (BEAN, SomeClass&, "someClassBean"),
+    (BEAN_INSTANCE, CustomClass*, instance)
+  )
+
+  // Through the RESOURCES Macro indicate what resources the configuration requires (more details below)
+  RESOURCES(
+    (int, intbean),
+    (std::string&, stringBean),
+    (SampleClass*, sampleClassInstance)
+  )
+  
+private:
+  CustomClass* instance;
+
+END_CONFIGURATION
+```
