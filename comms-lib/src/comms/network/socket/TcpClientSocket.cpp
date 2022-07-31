@@ -44,7 +44,7 @@ namespace cadf::comms {
      * Send a message
      */
     bool TcpClientSocket::send(const OutputBuffer *out) {
-        if (!isConnected() || out->getSize() > m_maxMessageSize)
+        if (!isConnected() || out->getDataSize() > m_maxMessageSize)
             return false;
 
         return m_dataSocket->send(out);

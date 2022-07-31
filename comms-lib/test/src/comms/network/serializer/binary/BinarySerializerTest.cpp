@@ -101,11 +101,13 @@ BOOST_AUTO_TEST_SUITE(SerializerBinary_Test_Suite)
     BOOST_AUTO_TEST_CASE(SerializeDeserializeSingleValue) {
         int orig = 13579;
         cadf::comms::OutputBuffer out(cadf::comms::binary::DataSerializer<int>::sizeOf(orig));
-        BOOST_CHECK_EQUAL(cadf::comms::binary::DataSerializer<int>::sizeOf(orig), out.getSize());
+        BOOST_CHECK_EQUAL(0, out.getDataSize());
+        BOOST_CHECK_EQUAL(cadf::comms::binary::DataSerializer<int>::sizeOf(orig), out.getTotalSize());
         cadf::comms::binary::DataSerializer<int>::serialize(orig, &out);
+        BOOST_CHECK_EQUAL(cadf::comms::binary::DataSerializer<int>::sizeOf(orig), out.getDataSize());
 
-        cadf::comms::InputBuffer in(out.getData(), out.getSize());
-        BOOST_CHECK_EQUAL(cadf::comms::binary::DataSerializer<int>::sizeOf(orig), in.getSize());
+        cadf::comms::InputBuffer in(out.getData(), out.getDataSize());
+        BOOST_CHECK_EQUAL(cadf::comms::binary::DataSerializer<int>::sizeOf(orig), in.getDataSize());
         int copy = cadf::comms::binary::DataSerializer<int>::deserialize(&in);
         BOOST_CHECK_EQUAL(orig, copy);
     }
@@ -116,11 +118,13 @@ BOOST_AUTO_TEST_SUITE(SerializerBinary_Test_Suite)
     BOOST_AUTO_TEST_CASE(SerializeDeserializeSinglePointer) {
         int orig = 13579;
         cadf::comms::OutputBuffer out(cadf::comms::binary::DataSerializer<int*>::sizeOf(&orig));
-        BOOST_CHECK_EQUAL(cadf::comms::binary::DataSerializer<int*>::sizeOf(&orig), out.getSize());
+        BOOST_CHECK_EQUAL(0, out.getDataSize());
+        BOOST_CHECK_EQUAL(cadf::comms::binary::DataSerializer<int*>::sizeOf(&orig), out.getTotalSize());
         cadf::comms::binary::DataSerializer<int*>::serialize(&orig, &out);
+        BOOST_CHECK_EQUAL(cadf::comms::binary::DataSerializer<int*>::sizeOf(&orig), out.getDataSize());
 
-        cadf::comms::InputBuffer in(out.getData(), out.getSize());
-        BOOST_CHECK_EQUAL(cadf::comms::binary::DataSerializer<int*>::sizeOf(&orig), in.getSize());
+        cadf::comms::InputBuffer in(out.getData(), out.getDataSize());
+        BOOST_CHECK_EQUAL(cadf::comms::binary::DataSerializer<int*>::sizeOf(&orig), in.getDataSize());
         int *copy = cadf::comms::binary::DataSerializer<int*>::deserialize(&in);
         BOOST_CHECK_EQUAL(orig, *copy);
         delete (copy);
@@ -132,11 +136,13 @@ BOOST_AUTO_TEST_SUITE(SerializerBinary_Test_Suite)
     BOOST_AUTO_TEST_CASE(SerializeDeserializeStdString) {
         std::string orig = "Test string for serialization!";
         cadf::comms::OutputBuffer out(cadf::comms::binary::DataSerializer<std::string>::sizeOf(orig));
-        BOOST_CHECK_EQUAL(cadf::comms::binary::DataSerializer<std::string>::sizeOf(orig), out.getSize());
+        BOOST_CHECK_EQUAL(0, out.getDataSize());
+        BOOST_CHECK_EQUAL(cadf::comms::binary::DataSerializer<std::string>::sizeOf(orig), out.getTotalSize());
         cadf::comms::binary::DataSerializer<std::string>::serialize(orig, &out);
+        BOOST_CHECK_EQUAL(cadf::comms::binary::DataSerializer<std::string>::sizeOf(orig), out.getDataSize());
 
-        cadf::comms::InputBuffer in(out.getData(), out.getSize());
-        BOOST_CHECK_EQUAL(cadf::comms::binary::DataSerializer<std::string>::sizeOf(orig), in.getSize());
+        cadf::comms::InputBuffer in(out.getData(), out.getDataSize());
+        BOOST_CHECK_EQUAL(cadf::comms::binary::DataSerializer<std::string>::sizeOf(orig), in.getDataSize());
         std::string copy = cadf::comms::binary::DataSerializer<std::string>::deserialize(&in);
         BOOST_CHECK_EQUAL(orig, copy);
     }
@@ -158,7 +164,7 @@ BOOST_AUTO_TEST_SUITE(SerializerBinary_Test_Suite)
         cadf::comms::OutputBuffer out(calcSize);
         cadf::comms::binary::DataSerializer<std::array<TestData, 5>>::serialize(data, &out);
 
-        cadf::comms::InputBuffer in(out.getData(), out.getSize());
+        cadf::comms::InputBuffer in(out.getData(), out.getDataSize());
         std::array<TestData, 5> copy = cadf::comms::binary::DataSerializer<std::array<TestData, 5>>::deserialize(&in);
         SerializerBinaryTest::checkArrayEqual(data, copy);
     }
@@ -174,7 +180,7 @@ BOOST_AUTO_TEST_SUITE(SerializerBinary_Test_Suite)
         cadf::comms::OutputBuffer out(calcSize);
         cadf::comms::binary::DataSerializer<std::vector<double>>::serialize(data, &out);
 
-        cadf::comms::InputBuffer in(out.getData(), out.getSize());
+        cadf::comms::InputBuffer in(out.getData(), out.getDataSize());
         std::vector<double> copy = cadf::comms::binary::DataSerializer<std::vector<double>>::deserialize(&in);
         SerializerBinaryTest::checkVectorEqual(data, copy);
     }
@@ -194,7 +200,7 @@ BOOST_AUTO_TEST_SUITE(SerializerBinary_Test_Suite)
         cadf::comms::OutputBuffer out(calcSize);
         cadf::comms::binary::DataSerializer<std::map<int, short>>::serialize(data, &out);
 
-        cadf::comms::InputBuffer in(out.getData(), out.getSize());
+        cadf::comms::InputBuffer in(out.getData(), out.getDataSize());
         std::map<int, short> copy = cadf::comms::binary::DataSerializer<std::map<int, short>>::deserialize(&in);
         SerializerBinaryTest::checkMapEqual(data, copy);
     }
@@ -224,7 +230,8 @@ BOOST_AUTO_TEST_SUITE(SerializerBinary_Test_Suite)
                 + cadf::comms::binary::DataSerializer<short*>::sizeOf(val7) + cadf::comms::binary::DataSerializer<std::array<std::string, 3>>::sizeOf(val8) + cadf::comms::binary::DataSerializer<std::vector<TestData>>::sizeOf(val9)
                 + cadf::comms::binary::DataSerializer<std::map<std::string, std::string>>::sizeOf(val10);
         cadf::comms::OutputBuffer out(dataSize);
-        BOOST_CHECK_EQUAL(dataSize, out.getSize());
+        BOOST_CHECK_EQUAL(0, out.getDataSize());
+        BOOST_CHECK_EQUAL(dataSize, out.getTotalSize());
         cadf::comms::binary::DataSerializer<double>::serialize(val1, &out);
         cadf::comms::binary::DataSerializer<float>::serialize(val2, &out);
         cadf::comms::binary::DataSerializer<unsigned long>::serialize(val3, &out);
@@ -235,9 +242,10 @@ BOOST_AUTO_TEST_SUITE(SerializerBinary_Test_Suite)
         cadf::comms::binary::DataSerializer<std::array<std::string, 3>>::serialize(val8, &out);
         cadf::comms::binary::DataSerializer<std::vector<TestData>>::serialize(val9, &out);
         cadf::comms::binary::DataSerializer<std::map<std::string, std::string>>::serialize(val10, &out);
+        BOOST_CHECK_EQUAL(dataSize, out.getDataSize());
 
-        cadf::comms::InputBuffer in(out.getData(), out.getSize());
-        BOOST_CHECK_EQUAL(dataSize, in.getSize());
+        cadf::comms::InputBuffer in(out.getData(), out.getDataSize());
+        BOOST_CHECK_EQUAL(dataSize, in.getDataSize());
         BOOST_CHECK_EQUAL(out.getData(), in.getData());
         double val1Copy = cadf::comms::binary::DataSerializer<double>::deserialize(&in);
         float val2Copy = cadf::comms::binary::DataSerializer<float>::deserialize(&in);
@@ -280,7 +288,7 @@ BOOST_AUTO_TEST_SUITE(SerializerBinary_Test_Suite)
         cadf::comms::OutputBuffer outBuffer(serializer.getSize());
         serializer.serialize(&outBuffer);
 
-        cadf::comms::InputBuffer inBuffer(outBuffer.getData(), outBuffer.getSize());
+        cadf::comms::InputBuffer inBuffer(outBuffer.getData(), outBuffer.getDataSize());
         cadf::comms::binary::MessageDeserializer deserializer(&inBuffer);
         BOOST_CHECK_EQUAL("TestMessage3", deserializer.getMessageType());
         BOOST_CHECK_EQUAL(10, deserializer.getRecipientType());
@@ -305,7 +313,7 @@ BOOST_AUTO_TEST_SUITE(SerializerBinary_Test_Suite)
         delete(serializer);
 
         // Deserialize the information
-        cadf::comms::InputBuffer in(out.getData(), out.getSize());
+        cadf::comms::InputBuffer in(out.getData(), out.getDataSize());
         cadf::comms::IDeserializer *deserializer = cadf::comms::binary::BinaryProtocol::createDeserializer(&in);
         BOOST_CHECK_EQUAL("TestMessage1", deserializer->getMessageType());
         BOOST_CHECK_EQUAL(31, deserializer->getRecipientType());

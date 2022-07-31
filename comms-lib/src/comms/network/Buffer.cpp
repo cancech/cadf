@@ -4,14 +4,14 @@ namespace cadf::comms {
     /**
      * CTOR - create a buffer of the given size.
      */
-    Buffer::Buffer(size_t size) : m_bufferSize(size), m_buffer(new char[size]), m_currIndex(0) {
+    Buffer::Buffer(size_t size) : m_totalSize(size), m_buffer(new char[size]), m_currIndex(0), m_dataSize(0) {
     }
 
     /**
      * CTOR - create a buffer from the provided data.
      */
-    Buffer::Buffer(const char *buffer, size_t size) : m_bufferSize(size), m_buffer(new char[size]), m_currIndex(0) {
-        memcpy(m_buffer, buffer, m_bufferSize);
+    Buffer::Buffer(const char *buffer, size_t size) : m_totalSize(size), m_buffer(new char[size]), m_currIndex(0), m_dataSize(size) {
+        memcpy(m_buffer, buffer, m_totalSize);
     }
 
     /**

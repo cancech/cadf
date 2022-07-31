@@ -7,6 +7,7 @@
 #include <iostream>
 #include <memory>
 
+#include "comms/Constants.h"
 #include "comms/network/serializer/Serializer.h"
 #include "comms/message/MessagePacket.h"
 #include "comms/message/MessageException.h"
@@ -41,6 +42,15 @@ namespace cadf::comms {
     class MessageFactory: public IMessageFactory {
 
         public:
+            /**
+             * CTOR
+             *
+             * @param bufferSize size_t unsigned integer size to use for the buffer when serializing messages. Defaults to MessageConstants::AUTO_SIZE, which
+             *                          will automatically determine the size of the buffer based on the size of the serialized data
+             */
+            MessageFactory(size_t bufferSize = MessageConstants::AUTO_SIZE): m_bufferSize(bufferSize) {
+            }
+
             /**
              * DTOR
              */
@@ -106,8 +116,7 @@ namespace cadf::comms {
             virtual OutputBuffer* serializeMessage(const MessagePacket &packet) const {
                 const IMessage *msg = packet.getMessage();
                 std::unique_ptr<ISerializer> serializer(m_serializers.at(msg->getType())->buildSerializer(msg, packet.getRecipientType(), packet.getRecipientInstance()));
-                //TODO allow for a static buffer size
-                OutputBuffer *out = new OutputBuffer(serializer->getSize());
+                OutputBuffer *out = new OutputBuffer(m_bufferSize == MessageConstants::AUTO_SIZE ? serializer->getSize() : m_bufferSize);
                 try {
                     serializer->serialize(out);
                     return out;
@@ -142,6 +151,8 @@ namespace cadf::comms {
             std::map<std::string, IMessage*> m_messages;
             // Mapping of all serializer factories to message types
             std::map<std::string, const ISerializerFactory*> m_serializers;
+            // The size of the buffer to allocate
+            size_t m_bufferSize;
     };
 
 }

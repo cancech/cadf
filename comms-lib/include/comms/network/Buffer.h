@@ -24,8 +24,17 @@ namespace cadf::comms {
              *
              * @return size_t indicating the size of the data within the buffer.
              */
-            size_t getSize() const {
-                return m_bufferSize;
+            size_t getDataSize() const {
+                return m_dataSize;
+            }
+
+            /**
+             * Get the Total size of the buffer (maximum amount of data that it can contain.
+             *
+             * @return size_t indicating the size of the total size of the buffer.
+             */
+            size_t getTotalSize() const {
+                return m_totalSize;
             }
 
             /**
@@ -38,8 +47,10 @@ namespace cadf::comms {
             }
 
         protected:
-            // The size of the buffer (in bytes).
-            size_t m_bufferSize;
+            // The size of the data (in bytes)
+            size_t m_dataSize;
+            // The size of the buffer (in bytes)
+            size_t m_totalSize;
             // The start of the buffer
             char *m_buffer;
             // The index/offset where the next buffer operation will take place
@@ -96,6 +107,7 @@ namespace cadf::comms {
             template<typename T>
             void append(const T &data, size_t dataSize) {
                 AppendValue<T>::append(this, data, dataSize);
+                m_dataSize += dataSize;
             }
 
         private:
@@ -128,7 +140,7 @@ namespace cadf::comms {
             template<typename T>
             void appendToBuffer(const T *data, const size_t &dataSize) {
                 size_t nextSize = m_currIndex + dataSize;
-                if (nextSize > m_bufferSize)
+                if (nextSize > m_totalSize)
                     throw BufferOverflowException();
 
                 memcpy(m_buffer + m_currIndex, data, dataSize);
@@ -211,7 +223,7 @@ namespace cadf::comms {
             template<typename T>
             void nextValue(T *destination, const size_t &dataSize) {
                 size_t nextSize = m_currIndex + dataSize;
-                if (nextSize > m_bufferSize)
+                if (nextSize > m_totalSize)
                     throw BufferOverflowException();
 
                 memcpy(destination, m_buffer + m_currIndex, dataSize);

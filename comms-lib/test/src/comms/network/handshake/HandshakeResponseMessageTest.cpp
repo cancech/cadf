@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_SUITE(HandshakeResponseMessageV1_Test_Suite)
         cadf::comms::OutputBuffer out(sizeof(int) * 2);
         cadf::comms::binary::serializeData(data, &out);
 
-        cadf::comms::InputBuffer in(out.getData(), out.getSize());
+        cadf::comms::InputBuffer in(out.getData(), out.getDataSize());
         BOOST_CHECK_EQUAL(data, cadf::comms::binary::deserializeData<cadf::comms::HandshakeResponseDataV1>(&in));
     }
 
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_SUITE(HandshakeResponseMessageV1_Test_Suite)
         serializer.serialize(&out);
         BOOST_CHECK_EQUAL(expectedJson, out.getData());
 
-        cadf::comms::InputBuffer in(out.getData(), out.getSize());
+        cadf::comms::InputBuffer in(out.getData(), out.getDataSize());
         cadf::comms::dom::Deserializer deserializer(cadf::dom::json::JsonConverter::instance(), &in);
         BOOST_CHECK_EQUAL("HandshakeResponseMessageV1", deserializer.getMessageType());
         BOOST_CHECK_EQUAL(data, deserializer.getData<cadf::comms::HandshakeResponseDataV1>());

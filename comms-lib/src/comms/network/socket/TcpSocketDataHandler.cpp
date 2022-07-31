@@ -74,9 +74,9 @@ namespace cadf::comms {
      * Send the message
      */
     bool TcpSocketDataHandler::send(const OutputBuffer *out) {
-        if (out->getSize() > m_maxMessageSize)
+        if (out->getDataSize() > m_maxMessageSize)
             return false;
 
-        return ::send(m_socketFd, out->getData(), out->getSize(), 0) == (int) out->getSize();
+        return ::send(m_socketFd, out->getData(), out->getDataSize(), 0) == (int) out->getDataSize();
     }
 }

@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_SUITE(Message_Test_Suite)
         cadf::comms::binary::DataSerializer<TestData>::serialize(data, &out);
 
         // Deserialize it
-        cadf::comms::InputBuffer in(out.getData(), out.getSize());
+        cadf::comms::InputBuffer in(out.getData(), out.getDataSize());
         cadf::comms::DataMessage<TestData> copy("TestDataMessage", cadf::comms::binary::DataSerializer<TestData>::deserialize(&in));
 
         BOOST_CHECK_EQUAL(data, copy.getData());

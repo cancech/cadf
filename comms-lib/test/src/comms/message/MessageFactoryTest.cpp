@@ -59,12 +59,12 @@ BOOST_AUTO_TEST_SUITE(MessageFactory_Test_Suite)
     }
 
     /**
-     * Verify that a message is serialized and deserialized as expected.
+     * Verify that a message is serialized and deserialized as expected when an automatic size is used.
      *
      * Note the serialization and deserialization is faked, so only checking that the expected "fake" result is produced.
      */
-    BOOST_AUTO_TEST_CASE(Serialization) {
-        cadf::comms::MessageFactory<MockProtocol> factory;
+    BOOST_AUTO_TEST_CASE(SerializationAutoSize) {
+        cadf::comms::MessageFactory<MockProtocol> factory(cadf::comms::MessageConstants::AUTO_SIZE);
         BOOST_CHECK_EQUAL(false, factory.isMessageRegistered("TestMessage1"));
         factory.registerMessage(new TestMessage1(), new MockSerializerFactory());
         BOOST_CHECK(factory.isMessageRegistered("TestMessage1"));
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_SUITE(MessageFactory_Test_Suite)
         TestMessage1 msg;
         cadf::comms::MessagePacket packet(&msg, 1, 2);
         cadf::comms::OutputBuffer *buffer = factory.serializeMessage(packet);
-        BOOST_CHECK_EQUAL(11, buffer->getSize());
+        BOOST_CHECK_EQUAL(11, buffer->getDataSize());
         BOOST_CHECK_EQUAL("SERIALIZED", buffer->getData());
         delete (buffer);
 
@@ -81,6 +81,47 @@ BOOST_AUTO_TEST_SUITE(MessageFactory_Test_Suite)
         cadf::comms::MessagePacket *receivedPacket = factory.deserializeMessage(&in);
         BOOST_CHECK_EQUAL("TestMessage1", receivedPacket->getMessage()->getType());
         delete (receivedPacket);
+    }
+
+    /**
+     * Verify that a message is serialized and deserialized as expected when a sufficient amount of space is provided
+     *
+     * Note the serialization and deserialization is faked, so only checking that the expected "fake" result is produced.
+     */
+    BOOST_AUTO_TEST_CASE(SerializationSufficientStaticSize) {
+        cadf::comms::MessageFactory<MockProtocol> factory(20);
+        BOOST_CHECK_EQUAL(false, factory.isMessageRegistered("TestMessage1"));
+        factory.registerMessage(new TestMessage1(), new MockSerializerFactory());
+        BOOST_CHECK(factory.isMessageRegistered("TestMessage1"));
+
+        TestMessage1 msg;
+        cadf::comms::MessagePacket packet(&msg, 1, 2);
+        cadf::comms::OutputBuffer *buffer = factory.serializeMessage(packet);
+        BOOST_CHECK_EQUAL(11, buffer->getDataSize());
+        BOOST_CHECK_EQUAL("SERIALIZED", buffer->getData());
+        delete (buffer);
+
+        MockProtocol::m_expectedDeserializedMessageType = "TestMessage1";
+        cadf::comms::InputBuffer in("", 0);
+        cadf::comms::MessagePacket *receivedPacket = factory.deserializeMessage(&in);
+        BOOST_CHECK_EQUAL("TestMessage1", receivedPacket->getMessage()->getType());
+        delete (receivedPacket);
+    }
+
+    /**
+     * Verify that a message is serialized fails if an insufficient amount of space is allocated for the message serialization
+     *
+     * Note the serialization and deserialization is faked, so only checking that the expected "fake" result is produced.
+     */
+    BOOST_AUTO_TEST_CASE(SerializationInsufficientStaticSize) {
+        cadf::comms::MessageFactory<MockProtocol> factory(1);
+        BOOST_CHECK_EQUAL(false, factory.isMessageRegistered("TestMessage1"));
+        factory.registerMessage(new TestMessage1(), new MockSerializerFactory());
+        BOOST_CHECK(factory.isMessageRegistered("TestMessage1"));
+
+        TestMessage1 msg;
+        cadf::comms::MessagePacket packet(&msg, 1, 2);
+        BOOST_CHECK_THROW(factory.serializeMessage(packet), cadf::comms::BufferOverflowException);
     }
 
     BOOST_AUTO_TEST_SUITE_END()

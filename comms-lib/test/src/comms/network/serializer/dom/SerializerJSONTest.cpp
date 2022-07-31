@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_SUITE(SerializerJSON_Test_Suite)
         serializer.serialize(&outBuffer);
         BOOST_CHECK_EQUAL("{\"data\":{\"val1\":123,\"val2\":1.23},\"instance\":2,\"message\":\"TestMessage1\",\"type\":1}", outBuffer.getData());
 
-        cadf::comms::InputBuffer inBuffer(outBuffer.getData(), outBuffer.getSize());
+        cadf::comms::InputBuffer inBuffer(outBuffer.getData(), outBuffer.getDataSize());
         cadf::comms::dom::Deserializer deserializer(cadf::dom::json::JsonConverter::instance(), &inBuffer);
         BOOST_CHECK_EQUAL("TestMessage1", deserializer.getMessageType());
         BOOST_CHECK_EQUAL(1, deserializer.getRecipientType());
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_SUITE(SerializerJSON_Test_Suite)
         serializer.serialize(&outBuffer);
         BOOST_CHECK_EQUAL("{\"data\":{\"val1\":456,\"val2\":0.123},\"instance\":4,\"message\":\"TestMessage2\",\"type\":3}", outBuffer.getData());
 
-        cadf::comms::InputBuffer inBuffer(outBuffer.getData(), outBuffer.getSize());
+        cadf::comms::InputBuffer inBuffer(outBuffer.getData(), outBuffer.getDataSize());
         cadf::comms::dom::Deserializer deserializer(cadf::dom::json::JsonConverter::instance(), &inBuffer);
         BOOST_CHECK_EQUAL("TestMessage2", deserializer.getMessageType());
         BOOST_CHECK_EQUAL(3, deserializer.getRecipientType());
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_SUITE(SerializerJSON_Test_Suite)
         serializer->serialize(&out);
         BOOST_CHECK_EQUAL("{\"data\":{\"val1\":987,\"val2\":4.321},\"instance\":6,\"message\":\"TestMessage3\",\"type\":5}", out.getData());
 
-        cadf::comms::InputBuffer in(out.getData(), out.getSize());
+        cadf::comms::InputBuffer in(out.getData(), out.getDataSize());
         cadf::comms::IDeserializer *deserializer = cadf::comms::dom::json::JSONProtocol::createDeserializer(&in);
         BOOST_CHECK_EQUAL("TestMessage3", deserializer->getMessageType());
         BOOST_CHECK_EQUAL(5, deserializer->getRecipientType());
