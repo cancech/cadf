@@ -109,6 +109,12 @@ Note that `ENABLE_BEAN_AUTOREGISTRATION` is Header Only, meaning that the librar
 
 The [Configuration](include/di/Configuration.h) class can be seen as a recipe. It will require some resources (inputs) and then provide some beans (outputs)
 
+## Configuration Lifecycle
+
+The lifecycle of the [Configuration](include/di/Configuration.h) is managed by the [Context](include/di/Context.h) via the [BeanManager](include/di/BeanManager.h). The [Configuration](include/di/Configuration.h) reports what resources it requires from the [BeanManager](include/di/BeanManager.h) via the static `getResourceNames()`. Once all required resources become available within the [BeanManager](include/di/BeanManager.h) the [Configuration](include/di/Configuration.h) itself is instantiated and initialized. As part of the instantiation resources are to be pulled form the [BeanManager](include/di/BeanManager.h). As part of the initialization, `postInit()` is called where the necessary initialization (bean or otherwise) is to be done using the retrieved resources. Once the initialization is fully completed `provideBeans()` is called where beans provided by the [Configuration](include/di/Configuration.h) are registered with the [BeanManager](include/di/BeanManager.h).
+
+At this point the [Configuration](include/di/Configuration.h) will lie dormant until the termination of the [Context](include/di/Context.h). As the [Context](include/di/Context.h) is destroyed, all [Configurations](include/di/Configuration.h) will be destroyed (via their destructors) and any/all allocated memory should be dealt with as appropriate.
+
 ## Defining a Configuration
 
 In order for a [Configuration](include/di/Configuration.h) to be usable within a [Context](include/di/Context.h), it must:
@@ -116,10 +122,12 @@ In order for a [Configuration](include/di/Configuration.h) to be usable within a
 * Extend the `cadf::di::Configuration` class.
 * Provide a constructor that matches the exact signature of the base `cadf::di::Configuration` constructor.
 * Override the getName() static member function to return a plain text name of the [Configuration](include/di/Configuration.h) class. _(1)_
-* Override the getResourceNamess() static member function to return a complete list of names of all resources the [Configuration](include/di/Configuration.h) requires. _(1)_
+* Override the getResourceNamess() static member function to return a complete list of names of all resources the [Configuration](include/di/Configuration.h) requires.
 * Override the getBeanNames() static member function to return a complete list of all beans the [Configuration](include/di/Configuration.h) will provide. _(1)_
 
-_(1) Strickly speaking these are not required to compile or for core functionality, however they are required for error checking and debug._
+_(1) Strickly speaking these are only used for error checking and debug._
+
+There is nothing preventing following traditional code practices, and manually extend and create the [Configuration](include/di/Configuration.h) class, however that will lead to verbose, repetative, and error prone code. To simplify the process, a series of Macros are provided to ease the process as much as possible.
 
 ### Configuration Macros
 
