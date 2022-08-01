@@ -7,11 +7,11 @@ A comprehensive library to facilitate Dependency Injection: the sharing of objec
 * A single [BeanManager](include/di/BeanManager.h) and any number of [Configuration](include/di/Configuration.h) classes are then contained within a single [Context](include/di/Context.h). The [Context](include/di/Context.h) is responsible for assembling the [Configurations](include/di/Configuration.h) and ultimately responsible for the life-cycle of the [Configuration](include/di/Configuration.h) and beans within.
 * An application can have one or more [Contexts](include/di/Context.h), and as each Context will have its own [BeanManager](include/di/BeanManager.h), each will be independent from one another.
 
-# Context
+## Context
 
 The [Context](include/di/Context.h) can be viewed as a sandbox within which beans can be shared by means of a [BeanManager](include/di/BeanManager.h) dedicated to the [Context](include/di/Context.h). There is no manner through which to share beans between [Contexts](include/di/Context.h) directly, therefore custom bridging code will have to be provided in order to facilitate that form of sharing.
 
-## Creating a Context
+### Creating a Context
 
 Creating a new [Context](include/di/Context.h) is as simple as creating an instance of the [Context](include/di/Context.h) class. The [Context](include/di/Context.h) will create the [BeanManager](include/di/BeanManager.h) instance for itself, and allow the registration of [Configuration](include/di/Configuration.h) classes. Once all of the desired [Configurations](include/di/Configuration.h) are registered, the [Context](include/di/Context.h) must be assembled at which time it will attempt to create and initialise all registered [Configurations](include/di/Configuration.h). If there is an issue encountered during the assembly (primarily missing resource, type mismatch, or circular dependency between [Configurations](include/di/Configuration.h)) an exception will be thrown indicating where and why assembling the [Context](include/di/Context.h) failed.
 
@@ -23,11 +23,11 @@ sampleContext.assemble();
 ```
 Note that the [Configuration](include/di/Configuration.h) class instances are not passed into the [Context](include/di/Context.h) (their creation would most likely fail due to missing resources at this stage), but rather their type is passed through the template. Any number of [Configuration](include/di/Configuration.h) class types can be passed in to a single call to `registerConfiguration` (minimum one).
 
-## Destroying a Context
+### Destroying a Context
 
 The life-cycle of the context is tied to the life-cycle of the [Context](include/di/Context.h) class. Once that instance is destroyed, all of the registered [Configurations](include/di/Configuration.h) will be destroyed, and any beans which are managed by the [BeanManager](include/di/BeanManager.h) will be destroyed as well.
 
-## Managing Beans Across Contexts
+### Managing Beans Across Contexts
 
 There may be times when it becomes necessary to combine beans that are either shared across different [Contexts](include/di/Context.h), or beans that live outside of any given single [Context](include/di/Context.h). To account for these situations the [Context](include/di/Context.h) class has the ability to register beans directly (inject a bean from outside the context), or to extract beans from within a [Context](include/di/Context.h) to be used outside of it. To facilitate both of these situations, the [Context](include/di/Context.h) actually extends the [BeanManager](include/di/BeanManager.h) allowing for direct access to beans already registered within the [Context](include/di/Context.h) (via `BeanManager::getBean<Type>("name")`), or to manually register one-off beans using either [Creators](include/di/BeanCreator.h) or an existing instance. Note that the bean life-cycle rules do not change for beans that are registered or retrieved in this manner. Meaning:
 
@@ -35,14 +35,14 @@ There may be times when it becomes necessary to combine beans that are either sh
 * Destruction of a [Context](include/di/Context.h) will in turn destroy all registered [Creators](include/di/BeanCreator.h), with each [Creator](include/di/BeanCreator.h) determining how to manage any memory it allocates (i.e.: `cadf::di::SingletonBeanCreator` will destroy the instance, whereas `cadf::di::FactoryBeanCreator` leaves the memory management to the client)
 * Any instances registered with the [Context](include/di/Context.h) are not handled at all, and it is expected that whomever created the instance will then bear the responsibility for managing its life-cycle.
 
-# BeanManager
+## BeanManager
 
 As mentioned, the [BeanManager](include/di/BeanManager.h) is responsible for managing the specific beans within the [Context](include/di/Context.h). The [Configurations](include/di/Configuration.h) will pull resources from it, push beans into it, and through this allow for instances of classes or types to be easily passed around the application. To push a bean into the [BeanManager](include/di/BeanManager.h) it must be registered, and registering the bean can be done in one of two ways:
 
 * Instance
 * Creator
 
-## Instance
+### Instance
 
 An instance bean is essentially a specific instance of an object or type, that is registered under a name within the [BeanManager](include/di/BeanManager.h). The nature of what this truly means is dependent on what type is registered (pointer, reference, or scalar), with the result being the same as if the type was retrieve via a "get" member function. A pointer or reference will pass the pointer or reference around and thus sharing the same instance across multiple actors, whereas a scalar will be passed via copy with all of the ramifications that that brings with it. The source [Configuration](include/di/Configuration.h) of an instance which allocated the memory, is responsible for de-allocating it upon destruction. Or some other approach taken based on what is applicable in the specific circumstance. The [BeanManager](include/di/BeanManager.h) will not manage any memory of any instance passed into it. To register an instance simply
 
@@ -52,7 +52,7 @@ BeanManager::registerBeanInstance<Type>("Name", someInstance);
 
 Note that the compiler may be able to deduce the type on its own, however this is not a guarantee. For example, when passing a scalar instance the compiler will most likely deduce a scalar type, instead of a reference that may be more desirable. For this reason the Configuration Macros do not take the change and force the type to be specified.
 
-## Creator
+### Creator
 
 This is a more interesting means through which to manage beans. In this situation no instance is created outright, but rather a Creator is specified to indicate how the bean is to be created and managed. There are several Creators provided (see [BeanCreator.h](include/di/BeanCreator.h)):
 
@@ -99,23 +99,23 @@ BEANS(
 ```
 
 
-### BEAN Autoregistration
+#### BEAN Autoregistration
 
 As the description of the Bean Creator indicates, the provided Creators only work with beans that provide a default constructor. This limitation does allow for an extra piece of flexibility, specifically that it does not truly matter if a bean was registered prior to asking for it so long as it can be created by one of these provided Creators. If the bean in question can be created without any extra information, it is possible for it to be registered and created at the time of asking for it. This functionality is disabled by default, however this form of auto-registration can be enabled at compile time via `ENABLE_BEAN_AUTOREGISTRATION`. When this flag is defined, when the BeanManager is asked to retrieve a bean which has not been registered yet, it will be registered at that time with a [cadf::di::SingletonBeanCreator](include/di/BeanCreator.h).
 
 Note that `ENABLE_BEAN_AUTOREGISTRATION` is Header Only, meaning that the library itself need not be recompiled in order to change this behaviour.
 
-# Configuration
+## Configuration
 
 The [Configuration](include/di/Configuration.h) class can be seen as a recipe. It will require some resources (inputs) and then provide some beans (outputs)
 
-## Configuration Lifecycle
+### Configuration Lifecycle
 
 The lifecycle of the [Configuration](include/di/Configuration.h) is managed by the [Context](include/di/Context.h) via the [BeanManager](include/di/BeanManager.h). The [Configuration](include/di/Configuration.h) reports what resources it requires from the [BeanManager](include/di/BeanManager.h) via the static `getResourceNames()`. Once all required resources become available within the [BeanManager](include/di/BeanManager.h) the [Configuration](include/di/Configuration.h) itself is instantiated and initialized. As part of the instantiation resources are to be pulled form the [BeanManager](include/di/BeanManager.h). As part of the initialization, `postInit()` is called where the necessary initialization (bean or otherwise) is to be done using the retrieved resources. Once the initialization is fully completed `provideBeans()` is called where beans provided by the [Configuration](include/di/Configuration.h) are registered with the [BeanManager](include/di/BeanManager.h).
 
 At this point the [Configuration](include/di/Configuration.h) will lie dormant until the termination of the [Context](include/di/Context.h). As the [Context](include/di/Context.h) is destroyed, all [Configurations](include/di/Configuration.h) will be destroyed (via their destructors) and any/all allocated memory should be dealt with as appropriate.
 
-## Defining a Configuration
+### Defining a Configuration
 
 In order for a [Configuration](include/di/Configuration.h) to be usable within a [Context](include/di/Context.h), it must:
 
@@ -129,11 +129,11 @@ _(1) Strickly speaking these are only used for error checking and debug._
 
 There is nothing preventing following traditional code practices, and manually extend and create the [Configuration](include/di/Configuration.h) class, however that will lead to verbose, repetative, and error prone code. To simplify the process, a series of Macros are provided to ease the process as much as possible.
 
-### Configuration Macros
+#### Configuration Macros
 
 A series of Macros are available to facility the definition and creation of [Configuration](include/di/Configuration.h) classes. It is highly recommended to make use of these to simplify the process of creating new [Configurations](include/di/Configuration.h), and to avoid repetitive or boiler plate code. This should also maximise future proofing and decrease the amount of rework required as future updates are released.
 
-#### CONFIGURATION Macro
+##### CONFIGURATION Macro
 
 ```C++
 CONFIGURATION(ExampleConfiguration)
@@ -147,7 +147,7 @@ class ExampleConfiguration: public cadf::di::BaseConfiguration { \
 		static std::string getName() { return "ExampleConfiguration"; }
 ```
 
-#### DEPENDENCIES Macro
+##### DEPENDENCIES Macro
 
 ```c++
 DEPENDENCIES(SubConfiguration1, SubConfiguration2, SubConfiguration3)
@@ -169,7 +169,7 @@ static std::vector<corm::ConfigurationWrapperInterface*> getDependentConfigurati
 }
 ```
 
-#### BEANS Macro
+##### BEANS Macro
 
 ```C++
   BEANS(
@@ -233,7 +233,7 @@ public: \
 
 Note that up to 256 beans can be registered in a single Configuration through the means indicated here.
 
-#### RESOURCES Macro
+##### RESOURCES Macro
 
 ```C++
   RESOURCES(
@@ -276,7 +276,7 @@ This Macro is present to maintain the symmetry of the Configuration definition, 
 ```C++
 };
 ```
-## Example Configuration
+### Example Configuration
 
 The following is the complete Configuration as described above.
 
@@ -326,7 +326,7 @@ private:
 END_CONFIGURATION
 ```
 
-# Example
+## Example
 
 To show how this all comes together a few [Configurations](include/di/Configuration.h) files and a [Context](include/di/Context.h) will be included as a contrived example. So to start with, we need some [Configurations](include/di/Configuration.h)
 
@@ -402,23 +402,23 @@ context.assemble();
 context.getBean<std::vector<int>>("allInts");
 ```
 
-# Under the Hood
+## Under the Hood
 
 The core architecture centres around a map (repository) in [BeanManager](include/di/BeanManager.h) where all registered beans are stored. The key to the map is the bean name (under which the bean is registered), however the value is not the bean itself. At least not directly. Instead there are some layers of abstraction in place to ensure a uniform and simple means of accessing the beans. 
 
-## Provider Classes
+### Provider Classes
 
 There are a series of `Provider` classes (defined in [BeanProvider.h](include/di/BeanProvider.h)), which are responsible for the abstraction and mechanism of storing and accessing the beans themselves.
 
-### BaseProvider
+#### BaseProvider
 
 The repository (bean map) contains an instance of `BaseProvider`, the top most parent of the `Provider` classes, which is a pure virtual class (interface). The purpose of `BaseProvider` is be the anchor of the concrete `Provider` class that can be stored in the repository. The concrete `Provider` classes are template classes, and multiple template classes of different types cannot be stored in the same map in C++. Or to put it a different way, the map must define which exact type of the template class it can store within itself. There is no "any" template wildcard that other languages such as Java allow. As the `BaseProvider`'s role is to act purely as a placeholder, there is little to no functionality available to it. In fact the only member function it provides the the `getType()` which is a pure virtual member function to retrieve the name of the type of the bean stored within as a plain string for error reporting and debugging purposes.
 
-### TypeProvider
+#### TypeProvider
 
 As the first subclass of the `BaseProvider`, the `TypeProvider`'s role is to manage and account for the type of the bean. It is a template class whose type corresponds to the type of the bean. The ultimate role of the `TypeProvider` is to track the type of the bean, but to abstract where the bean comes from or how it is created. In a perfect world the `getBean()` member function would be pure virtual, however C++ does not allow for virtual template member functions. To get around this limitation `getBean()` is fully implemented in `TypeProvider` but it relies on the concrete subclass to provide the bean instance through the pure virtual `provideBean()` member function that the concrete provider must implement. `provideBean()` is then called from within `getBean()` with the expectation that it will populate the `m_beanWrapper` as a `new`, after which `getBean()` retrieves the bean itself and cleans up the temporary memory `m_beanWrapper`.
 
-### BeanCreatorProvider
+#### BeanCreatorProvider
 
 This is a concrete Provider which relies on a template `Creator` class to determine how the beans are to be created/managed. It does virtually nothing, other than associate `TypeProvider::m_beanWrapper` with the `Creator`. The `BeanCreatorProvider` can work with any `Creator`, so long as the `Creator` matches the appropriate qualifications:
 
@@ -426,7 +426,7 @@ This is a concrete Provider which relies on a template `Creator` class to determ
 * The `Creator` has a public no argument `create()` member function.
 * The `Creator::create()` member function returns the bean instance as a `ValueWrapper<T>*` allocated via new.
 
-### BeanInstanceProvider
+#### BeanInstanceProvider
 
 This is a concrete Provider which provides the specific instance it was created with. It always provides the same instance, meaning:
 
@@ -434,15 +434,15 @@ This is a concrete Provider which provides the specific instance it was created 
 * References are effectively singleton.
 * Scalars are, as per the scalar norm, effectively factories.
 
-### ValueWrapper
+#### ValueWrapper
 
 The ValueWrapper is a supporting class, whose purpose is to act as the middleman between the concrete `Provider` and the `TypeProvider`, ensuring that the exact same instance that the `Provider` or `Creator` wanted to provide is what the `TypeProvider` received. Issues were encountered with references becoming scalar at some point along the way in the translation (i.e.: rather than being a reference to the original instance it became its own instance). The `ValueWrapper` ensures that this does not happen. It is an extremely simple struct, designed to server this exact purpose only.
 
-## BeanManager
+### BeanManager
 
 The `BeanManager` is at the core of DI functionality, as it tracks all of the beans and allows for them to be added and retrieved. It is here that the `Providers` explained above are put into use. 
 
-### Bean Registration
+#### Bean Registration
 
 When a bean is registered, depending on how it was registered a concrete provider will be created for it.
 
@@ -451,29 +451,29 @@ When a bean is registered, depending on how it was registered a concrete provide
 
 If the bean can be added (a series of checks are performed to ensure no duplicate beans and the like), the created concrete `Provider` is then added to the repository under the specified bean name.
 
-### Bean Retrieval
+#### Bean Retrieval
 
 The retrieval of beans is slightly more complex, however ultimately still straight forward. Regardless of how the bean was registered, or what concrete `Provider` it has, the same mechanism for retrieval is employed. Before anything else can be done, a quick check is performed to ensure that the bean request is in fact already registered. If it isn't, if Bean Autoregistration is enabled it is registered using the default `Creator`, or an exception is thrown.
 
 The act of retrieving the bean itself is about what one can expect, get the appropriate `Provider` from the repository, get the bean from it, and return it. The only extra comes in the form of `m_beanNameStack` which is in place to allow for cycle dependency checking. It is possible that attempting to create one bean will cause it to attempt to retrieve another bean, and so on, meaning that it is entirely possible for a cycle to exist where a bean will inadvertently be dependent on itself (i.e.: beanA requires beanB, which requires beanC, which required beanA). The cycle check will determine when this happens, throwing an exception indicating where the cycle exists.
 
-## Configuration
+### Configuration
 
 Where `BeanManager` is the core, the `Configuration` is the cornerstone. The expectation is that the client code will never touch upon the `BeanManager` directly, but rather perform all bean processing by means of `Configuration` classes. These classes allow the client to retrieve beans as resources and provide new beans in turn. The `Configuration` manages any/all resources it requires as private members, meaning that the `Configuration` cannot be instantiated until all required resources are available. To facilitate with this process a `ConfigurationWrapper` is created for each `Configuration` when it is registered.
 
-### ConfigurationWrapper
+#### ConfigurationWrapper
 
 As the name implies, the `ConfigurationWrapper` is a wrapper class for the `Configuration`. Since the `Configuration` itself cannot be initialised until after all required resources are available in the `BeanManager`, the `ConfigurationWrapper` is used to track what resources the `Configuration` is waiting on. The `Configuration` provides a list of resources it requires via the static `getResourceNames()` member function, the `ConfigurationWrapper` stores all of these names as `m_waitingResources` and during each `areResourcesSatisfied()` check determines which of the waiting resources have become available. Once `m_waitingResources` has been depleted, the `Configuration` has all of its resources fulfilled, and it can be initialised. This is the main duty of the `ConfigurationWrapper`, however it acts as an intermediary for the uninitialised `Configuration` in order debug related means. Ultimately until the `Configuration` itself has been initialised, the `ConfigurationWrapper` is the only way through which to retrieve any information about the `Configuration`. In this manner it can be considered to act as the metadata for the uninitialised `Configuration`.
 
-### ConfigurationWrapperInterface
+#### ConfigurationWrapperInterface
 
 The `ConfigurationWrapper` is a template class, with the template being the `Configuration` class that it is wrapping. As per what was described in the `Provider` section above, there is no "any" template wildcard, meaning that for the `Context` to track the `ConfigurationWrapper` it must know what exact type the template is. This makes dealing with `ConfigurationWrappers` in a uniform or simple manner impossible, which is where the `ConfigurationWrapperInterface` comes in. It is a pure virtual class, that provides as pure virtual member functions all of the necessary features that the `Context` requires to interact fully with the `ConfigurationWrapper`, without needing to rely on the `Configuration` class type. Thus `ConfigurationWrapperInterface` is what the `Context` will primarily see.
 
-## Context
+### Context
 
 Where `BeanManager` is the core, and `Configuration` is the cornerstone, the `Context` is the glue that holds everything together. It is the `Context` that manages `Configurations`, and that provides the `BeanManager` that the `Configurations` use. In that respect it has a singular purpose: take in any number of `Configurations` and process them. Registering a `Configuration` will create the `ConfigurationWrapper` for it (and all of its dependent `Configurations`) and when all have been registered via `assemble()` it will attempt to initialise all registered `Configurations`.
 
-### Assemble Configuration
+#### Assemble Configuration
 
 The process of assembling the `Context` is ultimately rather straight forward. It continuously iterates across all of the `Configurations` until a point is reached where no `Configuration` is loaded. This can occur in one of two situations:
 
@@ -482,7 +482,7 @@ The process of assembling the `Context` is ultimately rather straight forward. I
 
 If successful, this means that the `Context` is sane, and the application can proceed forward with its purpose. If there are unfulfilled resources, that means that not all `Configurations` have been able to retrieve their necessary resources, which means either a resource is missing from the `Context`, or a dependency cycle exists between one or more `Configurations`. The `verifyContext()` will determine which is it, making use of the `CircularDependencyChecker` to find any cycles.
 
-### CircularDependencyChecker
+#### CircularDependencyChecker
 
 The `CircularDependencyChecker` is populated with the details of all of the `Configurations` that are as of yet waiting to be resolved. Namely:
 
