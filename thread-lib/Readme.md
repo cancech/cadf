@@ -1,4 +1,4 @@
-# thread-lib
+# thread-lib: Threading Library
 
 Builds on top of the Standard C++ thread capabilities to provide some additional quality of life add-ons.
 
