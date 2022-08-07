@@ -53,4 +53,10 @@ ___________   ___________   ___________        ___________
 -----------   -----------   -----------        -----------
 ```
 
-Unlike a traditional [Node](include/comms/node/Node.h), the [Bridge Node](include/comms/node/BridgeNode.h) connects to two [Buses](include/comms/bus/Bus.h) rather than just the one, and consequently it will have a _Type_ and _Instance_ on each (can be the same on both, or different, just must be a unique combination within each [Bus](include/comms/bus/Bus.h)).
+Unlike a traditional [Node](include/comms/node/Node.h), the [Bridge Node](include/comms/node/BridgeNode.h) registers with (thus connects to) two [Buses](include/comms/bus/Bus.h) rather than just the one, and consequently it will have a _Type_ and _Instance_ on each (can be the same on both, or different, just must be a unique combination within each [Bus](include/comms/bus/Bus.h)). One [Bus](include/comms/bus/Bus.h) is identified as _External_ and the other _Internal_. In its capabity as a bridge, it will facilitate the forwarding of messages from one [Bus](include/comms/bus/Bus.h) to the other. When configuring the [Bridge Node](include/comms/node/BridgeNode.h) forwarding rules must be specified in both directions, where a rules takes the form of 
+
+```
+MessageType forwards to Type and Instance
+```
+
+Meaning when a given type of message is received, the [Bridge Node](include/comms/node/BridgeNode.h) will forward it to indicated _Type_ and _Instance_ on the other [Bus](include/comms/bus/Bus.h). Forwarding rules from the _External_ to the _Internal_ [Bus](include/comms/bus/Bus.h) are specified via `addForwardToInternalRule(std::string messageType, int nodeType, int nodeInstance)` and vice versa from _Internal_ to _External_ are specified via `addForwardToExternalRule(std::string messageType, int nodeType, int nodeInstance)`. The [BROADCAST](include/comms/Constants.h) wildcard can be employed in the forwarding rules, and if no rule is defined for a given _MessageType_ it will not be forwarded.
