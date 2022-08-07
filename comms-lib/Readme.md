@@ -96,3 +96,71 @@ myNode.disconnect();
 Destroying the [Node](include/comms/node/Node.h) will automatically trigger a disconnection as well.
 
 ## Remote Bus
+
+With a remote bus, the [Bus](include/comms/bus/Bus.h) and [Nodes](include/comms/node/Node.h) are distributed (could be different machines, containers, or what have you) and require a network connection in order to communicate with each other. While the principle described above for the Local Bus is largely unchanged, the inclusion of network communication by necessity translates into significantly increased complexity. 
+
+### Server
+
+The [Bus](include/comms/bus/Bus.h) becomes a server into which the various [Nodes](include/comms/node/Node.h) connect as clients. [cadf::comms::ServerBus](include/comms/network/server/ServerBus.h) provides an implementation of middle layer that binds a server to the [Bus](include/comms/bus/Bus.h). Creating a [cadf::comms::ServerBus](include/comms/network/server/ServerBus.h) is a multistep process as shown in the following example:
+
+```C++
+// Define the details of the network connection for the server
+cadf::comms::NetworkInfo myNetworkInfo;
+myNetworkInfo.ipVersion = cadf::comms::NetworkInfo::IPv4;
+myNetworkInfo.netAddress = "127.0.0.1"; // The IP Address on which to accept client connections
+myNetworkInfo.port = 1234; // The port on which to accept client connections
+
+// Create the mechanism for handling client connections
+cadf::comms::ProtocolHandshakeFactory<PROTOCOL> myHandshakeFactory(myMaxMsgSize, myMsgFactory);
+cadf::comms::HandshakeHandler myHandshakeHandler(myHandshakeFactory);
+cadf::comms::BasicServerConnectionFactory<PROTOCOL> myConnectionFactory(myMsgFactory);
+cadf::comms::ServerConnectionHandler myConnectionHandler(&myHandshakeHandler, &myConnectionFactory);
+
+// Create the bus itself
+cadf::comms::TcpServerSocket myServerSocket(myNetworkInfo, &myConnectionHandler, myQueueSize);
+cadf::comms::LocalBasicBus myRoutingBus;
+cadf::comms::ServerBus remoteBus(&myServerSocket, &myRoutingBus);
+```
+
+Where:
+
+* [cadf::comms::ProtocolHandshakeFactory](include/comms/network/handshake/ProtocolHandshake.h) creates the logic for performing a handshake with a newly connected client
+* [cadf::comms::HandshakeHandler](include/comms/network/handshake/HandshakeHandler.h) triggers a handshake when a client connects
+* [cadf::comms::BasicServerConnectionFactory](include/comms/network/server/BasicServerConnectionFactory.h) creates an internal representation of the connected [Node](include/comms/node/Node.h) that is then registered with the [Bus](include/comms/bus/Bus.h) (equivalent to the [LocalConnection](include/comms/connection/LocalConnection.h) as shown in the Local Bus).
+* [cadf::comms::ServerConnectionHandler](include/comms/network/socket/ServerConnectionHandler.h) sits between the actual server socket and the [Bus](include/comms/bus/Bus.h), handling the lifecycle of client connection (triggering the handshake on connection, creating the internal connection representation on successful handshake, and cleanup on client disconnect)
+* [cadf::comms::TcpServerSocket](include/comms/network/socket/TcpServerSocket.h) the actual network socket into which the clients will connect
+
+To start the server and allow for clients to connect, simply connect the socket
+
+```C++
+myServerSocket.connect();
+```
+
+### Client
+
+Once the ServerBus is up and running, a [Node](include/comms/node/Node.h) can connect to it.
+
+```C++
+// Define the details of where to connect to the server
+cadf::comms::NetworkInfo myNetworkInfo;
+myNetworkInfo.ipVersion = cadf::comms::NetworkInfo::IPv4;
+myNetworkInfo.netAddress = "127.0.0.1"; // The IP Address on which to accept client connections
+myNetworkInfo.port = 1234; // The port on which to accept client connections
+
+cadf::comms::TcpClientSocket mySocket(myNetworkInfo, myMaxMsgSize);
+cadf::comms::BasicClient myClient(&mySocket);
+cadf::comms::ClientConnection<PROTOCOL> myConnection(myType, myInstance, myMsgFactory, &myClient);
+cadf::comms::Node myNode(&myConnection);
+```
+
+Where:
+
+* [cadf::comms::TcpClientSocket](include/comms/network/socket/TcpClientSocket.h) the actual network socket through which the connection to the server is established
+* [cadf::comms::BasicClient](include/comms/network/client/BasicClient.h) wraps around and manages the client socket
+* [cadf::comms::ClientConnection](include/comms/connection/ClientConnection.h) network equivalent to the [LocalConnection](include/comms/connection/LocalConnection.h), which handles the connection (including handshaking) with the server
+
+Beyond this, the operation and usage of the [Node](include/comms/node/Node.h) is unchanged from the Local description above.
+
+### Handshake
+
+### Protocol
