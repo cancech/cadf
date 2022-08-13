@@ -106,6 +106,8 @@ The protocol is the mechanism through which data is serialized and deserialized 
 * [Binary](include/comms/network/serializer/binary/Serializer.h) for copying the data directly onto the network
 * [JSON](include/comms/network/serializer/dom/JsonSerializer.h) for converting the data into a JSON data structure
 
+The protocol to be employed is generally specified via a template parameter `<PROTOCOL>` in which case reference to the specific [cadf::comms::Protocol](include/comms/network/serializer/TemplateProtocol.h) extension that is to be used.
+
 ### Handshake
 
 The handshake is an important mechanism of establishing a connection between two entities ([Node](include/comms/node/Node.h) and [ServerBus](include/comms/network/server/ServerBus.h) in this case), by trading a series of messages up front to ensure that proper communication can be established. On the server side this is handled via the [cadf::comms::HandshakeHandler](include/comms/network/handshake/HandshakeHandler.h), which uses a [cadf::comms::IHandshakeFactory](include/comms/network/handshake/Handshake.h) to create a [cadf::comms::IHandshake](include/comms/network/handshake/Handshake.h) which will perform the handshake itself. A provided [cadf::comms::IHandshakeCompleteListener](include/comms/network/handshake/Handshake.h) is notified when the handshake is successfully completed. For the purpose of customizability the handshake classes are all pure virtual (interfaces), with one default implementation provided in the form of the [cadf::comms::ProtocolHandshakeFactory](include/comms/network/handshake/ProtocolHandshake.h) and [cadf::comms::ProtocolHandshake](include/comms/network/handshake/ProtocolHandshake.h). These will perform a handshake in the desired protocol, where:
@@ -176,3 +178,5 @@ Where:
 * [cadf::comms::ClientConnection](include/comms/connection/ClientConnection.h) network equivalent to the [LocalConnection](include/comms/connection/LocalConnection.h), which handles the connection (including handshaking) with the server
 
 Beyond this, the operation and usage of the [Node](include/comms/node/Node.h) is unchanged from the Local description above.
+
+### Message Passing
