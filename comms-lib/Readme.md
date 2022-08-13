@@ -97,11 +97,22 @@ Destroying the [Node](include/comms/node/Node.h) will automatically trigger a di
 
 ## Remote Bus
 
-With a remote bus, the [Bus](include/comms/bus/Bus.h) and [Nodes](include/comms/node/Node.h) are distributed (could be different machines, containers, or what have you) and require a network connection in order to communicate with each other. While the principle described above for the Local Bus is largely unchanged, the inclusion of network communication by necessity translates into significantly increased complexity. 
+With a remote bus, the [Bus](include/comms/bus/Bus.h) and [Nodes](include/comms/node/Node.h) are distributed (could be different machines, containers, or what have you) and require a network connection in order to communicate with each other. While the principle described above for the Local Bus is largely unchanged, the inclusion of network communication by necessity translates into significantly increased complexity.
+
+### Protocol
+
+### Handshake
+
+The handshake is an important mechanism of establishing a connection between two entities ([Node](include/comms/node/Node.h) and [ServerBus](include/comms/network/server/ServerBus.h) in this case), by trading a series of messages up front to ensure that proper communication can be established. On the server side this is handled via the [cadf::comms::HandshakeHandler](include/comms/network/handshake/HandshakeHandler.h), which uses a [cadf::comms::IHandshakeFactory](include/comms/network/handshake/Handshake.h) to create a [cadf::comms::IHandshake](include/comms/network/handshake/Handshake.h) which will perform the handshake itself. A provided [cadf::comms::IHandshakeCompleteListener](include/comms/network/handshake/Handshake.h) is notified when the handshake is successfully completed. For the purpose of customizability the handshake classes are all pure virtual (interfaces), with one default implementation provided in the form of the [cadf::comms::ProtocolHandshakeFactory](include/comms/network/handshake/ProtocolHandshake.h) and [cadf::comms::ProtocolHandshake](include/comms/network/handshake/ProtocolHandshake.h). These will perform a handshake in the desired protocol, where:
+
+* Upon client connecting to the server, the server will send a [cadf::comms::HandshkeInitMessage](include/comms/network/handshake/HandshakeInitMessage.h) indicating the max version of the handshake process the server will support
+* The client is expect to reply with a [cadf::comms::HandshakeResponseMessage](include/comms/network/handshake/HandshakeResponseMessage.h) of an appropriate version (currently max is V1), indicating the addressing details of the client (_Type_ and _Instance_)
+* With the addressing information received, the server will register the client with the server and reply with a [cadf::comms::HandshakeCompleteMessage](include/comms/network/handshake/HandshakeCompleteMessage.h) indicating the version of the handshake process that was completed, and by sending the message to indicate that the handshake process was completed successfully
+* At this point normal communication can commence between the two side.
 
 ### Server
 
-The [Bus](include/comms/bus/Bus.h) becomes a server into which the various [Nodes](include/comms/node/Node.h) connect as clients. [cadf::comms::ServerBus](include/comms/network/server/ServerBus.h) provides an implementation of middle layer that binds a server to the [Bus](include/comms/bus/Bus.h). Creating a [cadf::comms::ServerBus](include/comms/network/server/ServerBus.h) is a multistep process as shown in the following example:
+The [Bus](include/comms/bus/Bus.h) becomes a server into which the various [Nodes](include/comms/node/Node.h) connect as clients. [cadf::comms::ServerBus](include/comms/network/server/ServerBus.h) provides an implementation of middle layer that binds a server to the [Bus](include/comms/bus/Bus.h). Creating a [ServerBus](include/comms/network/server/ServerBus.h) is a multistep process as shown in the following example:
 
 ```C++
 // Define the details of the network connection for the server
@@ -160,7 +171,3 @@ Where:
 * [cadf::comms::ClientConnection](include/comms/connection/ClientConnection.h) network equivalent to the [LocalConnection](include/comms/connection/LocalConnection.h), which handles the connection (including handshaking) with the server
 
 Beyond this, the operation and usage of the [Node](include/comms/node/Node.h) is unchanged from the Local description above.
-
-### Handshake
-
-### Protocol
