@@ -179,4 +179,12 @@ Where:
 
 Beyond this, the operation and usage of the [Node](include/comms/node/Node.h) is unchanged from the Local description above.
 
-### Message Passing
+## Message Passing
+
+Regardless of which connection is employed (local or remote), or which protocol in the case of remote, the process of message passing and processing is the same. 
+
+### Register Messages
+
+### Send Messages
+
+### Receive Messages
