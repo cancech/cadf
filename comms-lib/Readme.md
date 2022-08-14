@@ -103,8 +103,9 @@ With a remote bus, the [Bus](include/comms/bus/Bus.h) and [Nodes](include/comms/
 
 The protocol is the mechanism through which data is serialized and deserialized to/from the network. Needless to say both sides of the communication must use the same protocol in order to be able to understand each other. A protocol is defined by extending the provided [cadf::comms::Protocol](include/comms/network/serializer/TemplateProtocol.h) through which a [cadf::comms::ISerializerFactory](include/comms/network/serializer/Serialier.h) (can extend the provided [cadf::comms::TemplateSerializerFactory](include/comms/network/serializer/TemplateProtocol.h) is created for the purpose of serializing a specific message to the desired network format, and a [cadf::comms::IDeserializer](include/comms/network/serializer/Serialier.h) to deserialize network data into program data. Some procotols are provided:
 
-* [Binary](include/comms/network/serializer/binary/Serializer.h) for copying the data directly onto the network
-* [JSON](include/comms/network/serializer/dom/JsonSerializer.h) for converting the data into a JSON data structure
+* [cadf::comms::binary::BinaryProtocol](include/comms/network/serializer/binary/Serializer.h) for copying the data directly onto the network
+* [cadf::comms::domm::json::JSONProtocol](include/comms/network/serializer/dom/JsonSerializer.h) for converting the data into a JSON data structure
+* [cadf::comms::local::LocalProtocol](include/comms/network/serializer/local/Serializer.h) dummy protocol for use with a Local bus to allow for the templates to be properly filled, yet which does nothing (in fact will generate exceptions is any attempt at (de)serialization is made)
 
 The protocol to be employed is generally specified via a template parameter `<PROTOCOL>` in which case reference to the specific [cadf::comms::Protocol](include/comms/network/serializer/TemplateProtocol.h) extension that is to be used.
 
@@ -181,10 +182,79 @@ Beyond this, the operation and usage of the [Node](include/comms/node/Node.h) is
 
 ## Message Passing
 
-Regardless of which connection is employed (local or remote), or which protocol in the case of remote, the process of message passing and processing is the same. 
+Regardless of which connection is employed (local or remote), or which protocol in the case of remote, the process of message passing and processing is the same. The only difference is when registering the messages with the [Node](include/comms/node/Node.h), however that is due to the differences in [Node](include/comms/node/Node.h) initialization and creation in each case, rather than any difference from the message handling.
 
 ### Register Messages
 
+The [Node](include/comms/node/Node.h) is only able to understand and process (send/receive) messages that it is aware of and registered with it. The process of registering messages with the node is performed via the [cadf::comms::MessageRegistry](include/comms/message/MessageRegistry.h) and [cadf::comms::MessageFactory](include/comms/message/MessageFactory.h).
+
+* [MessageRegistry](include/comms/message/MessageRegistry.h) - allows for the specification of which messages to register
+* [MessageFactory](include/comms/message/MessageFactory.h) - used by the [Node](include/comms/node/Node.h) to create instances of the messages
+
+So the [MessageRegistry](include/comms/message/MessageRegistry.h) defines which messages the [Node](include/comms/node/Node.h) is going to understand, and the [MessageFactory](include/comms/message/MessageFactory.h) will create the messages for it. As part of initialization the [MessageRegistry](include/comms/message/MessageRegistry.h) must register the messages with the [MessageFactory](include/comms/message/MessageFactory.h) for it to be aware of the desired messages.
+
+```C++
+/*
+ * For Remote
+ */
+cadf::comms::MessageRegistry<cadf::comms::dom::json::JSONProtocol, MyMessage, MyOtherMessage, MyLastMessage> myRemoteMsgRegistry;
+cadf::comms::MessageFactory<cadf::comms::dom::json::JSONProtocol> myRemoteMsgFactory;
+myRemoteMsgRegistry.registerMessages(&myRemoteMsgFactory);
+
+// For Server
+cadf::comms::ProtocolHandshakeFactory<cadf::comms::dom::json::JSONProtocol> myHandshakeFactory(myMaxMsgSize, &myRemoteMsgFactory);
+<snip>
+
+// For Client
+<snip>
+cadf::comms::ClientConnection<cadf::comms::dom::json::JSONProtocol> myConnection(myType, myInstance, &myRemoteMsgFactory, &myClient);
+<snip>
+
+
+/*
+ * For Local
+ */
+cadf::comms::MessageRegistry<cadf::comms::local::LocalProtocol, MyMessage, MyOtherMessage, MyLastMessage> myLocalMsgRegistry;
+cadf::comms::MessageFactory<cadf::comms::local::LocalProtocol> myLocalMsgFactory;
+myRemoteMsgRegistry.registerMessages(&myLocalMsgFactory);
+
+// For Client
+cadf::comms::LocalConnection myConnection(myType, myInstance, &myLocalMsgFactory);
+<snip>
+```
+
 ### Send Messages
 
+Sending a message is in quite straight forward. Once the [Node](include/comms/node/Node.h) is initialized and connected, simply call `sendMessage()`.
+
+```C++
+myNode.sendMessage(msgToSend, recipientType, recipientInstance);
+```
+
+`sendMessage()` returns a boolean to indicate the success/failure of sending, it may also throw an exception to indicate why a message failed to send (i.e.: attempting to send a message that was not registered with the [Node](include/comms/node/Node.h)).
+
 ### Receive Messages
+
+In order for a [Node](include/comms/node/Node.h) to receive a message, not only must be registered as per what is described above (that is required so that the [Node](include/comms/node/Node.h) can determine the contents of the message), but a [cadf::comms::IProcessor](include/comms/node/Processor.h) must be registered. [IProcessor](include/comms/node/Processor.h) is a pure virtual interface to side-step issues with template classes, and an implementation in the form of [cadf::comms::MessageProcessor](include/comms/node/Processor.h) is provided. Create an [IProcessor](include/comms/node/Processor.h) for the desired message type by extending [MessageProcessor](include/comms/node/Processor.h) and implementing the `processMessage()` method. `processMessage()` will be called when a message is received, and it is within that the message can be processed. Once the specific [MessageProcessor](include/comms/node/Processor.h) is created, it must be registered with the [Node](include/comms/node/Node.h).
+
+```C++
+struct MyMessageProcessor: cadf::comms::MessageProcessor<MyMessage> {
+
+     virtual void processMessage(cost MyMessage *msg) {
+          std::cout << "Message Received " << msg->getType() << std::endl;
+     }
+}
+
+<snip>
+MyMessageProcessor myMsgProcessor;
+myNode.addProcessor(&myMessageProcessor);
+</snip>
+```
+
+Once added, the [Node](include/comms/node/Node.h) will pass any messages of a given type to the [MessageProcessor](include/comms/node/Processor.h) created to process them. If no [MessageProcessor](include/comms/node/Processor.h) is added for a message of a given type, then any messages of that type are simply discarded.
+
+To stop processing messages of a given type, simply remove the [MessageProcessor](include/comms/node/Processor.h) for messages of that type
+
+```C++
+myNode.removeProcessor(&myMessageProcessor);
+```
