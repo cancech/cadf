@@ -9,7 +9,7 @@ endmacro()
 #
 # param0 - link_libs - libraries that are to be linked as part of the building (except for unit test libraries)
 function(configure_test link_libs)
-    include_directories(../../external)
+    include_directories(../../external/FakeIt)
     file(GLOB_RECURSE test_src_files CONFIGURE_DEPENDS src/*.cpp)
     add_executable(${PROJECT_NAME} ${test_src_files})
     target_include_directories(${PROJECT_NAME} PUBLIC include)

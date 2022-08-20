@@ -6,7 +6,7 @@ Herein are contained third-party dependencies which I haven't been able to find 
 
 * Author:  Eran Pe'er
 * Source:  https://github.com/eranpeer/FakeIt
-* Version: 2.0.9
+* Version: 2.3.0
 * License: [MIT](https://github.com/eranpeer/FakeIt/blob/master/LICENSE)
 
 A wonderful header-only library through which to perform Mocking for Unit Tests. The Single Header version for BOOST as provided by the FakeIt library has been copied.
