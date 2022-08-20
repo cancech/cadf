@@ -151,9 +151,6 @@ The [Binary Protocol](include/comms/network/serializer/binary/Serializer.h) bein
 For anything else, custom [DataSerializer](include/comms/network/serializer/binary/Serializer.h) overrides must be provided, such that `cadf::comms::binary::sizeOfData()`, `cadf::comms::binary::serializeData`, and `cadf::comms::binary::deserializeData` are implemented for the data type in question.
 
 ```C++
-/*
- * Binary Protocol
- */
 template<>
 size_t cadf::comms::binary::sizeOfData<MyData>(const MyData &data) {
      return sizeOf<int>(data.myIntValue) + sizeOf<std::string>(data.myStringValue) + 
@@ -178,6 +175,27 @@ MyData cadf::comms::binary::deserializeData<TestData>(cadf::comms::InputBuffer *
 ```
 
 ##### JSON Protocol
+
+Serializaing into JSON for the [JSONProtocol](include/comms/network/serializer/dom/JsonSerializer.h) is an overall more complex task, requiring the use of the [dom-lib](../dom-lib) library. As such the (de)serialization process employs the [dom-lib](../dom-lib) library to perform the brunt of the heavy lifting, with the (de)serializor populating or pulling from the DOM tree. The process is started from [cadf::comms::dom::json::JsonSerializer](include/comms/network/serializer/dom/JsonSerializer.h) and [cadf::comms::dom::json::JsonDeserializer](include/comms/network/serializer/dom/JsonSerializer.h) for serialization and deserialization respectively. The brunt of the (de)serialization work is handled by two functions that must be implemented for every data type [cadf::comms:dom::buildTree()](include/comms/network/serializer/dom/SerializerFuncs.h) and [cadf::comms::dom::loadFromTree()](include/comms/network/serializer/dom/SerializerFuncs.h), where [buildTree()](include/comms/network/serializer/dom/SerializerFuncs.h) is expected to use the [dom-lib](../dom-lib) to build a DOM tree representation of the data, while conversely [loadFromTree()](include/comms/network/serializer/dom/SerializerFuncs.h) loads the data from a DOM tree representation. The rest of the (de)serialization is performed internally by using the [dom-lib](../dom-lib) to convert the DOM tree to/from a JSON string.
+
+```C++
+template<>
+cadf::dom::DomNode cadf::comms::dom::buildTree<MyData>(const MyData &data) {
+    cadf::dom::DomNode node = cadf::dom::buildNode("myIntValue", data.myIntValue);
+    node["myStringValue"] = data.myStringValue;
+    node["myCommonData"] = buildTree<MyCommonDataStruct>(data.myCommonData);
+    return node;
+}
+
+template<>
+MyData cadf::comms::dom::loadFromTree<MyData>(const cadf::dom::DomNode &root) {
+    MyData data;
+    data.myIntValue = root["myIntValue"];
+    data.myStringValue = root["myStringValue"];
+    data.myCommonData = loadFromTree<MyCommonDataStruct>(root["myCommonData"]);
+    return data;
+}
+```
 
 ### Handshake
 
