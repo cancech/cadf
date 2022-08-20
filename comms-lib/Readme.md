@@ -109,6 +109,76 @@ The protocol is the mechanism through which data is serialized and deserialized 
 
 The protocol to be employed is generally specified via a template parameter `<PROTOCOL>` in which case reference to the specific [cadf::comms::Protocol](include/comms/network/serializer/TemplateProtocol.h) extension that is to be used.
 
+#### Message Definition
+
+Messages must extend from [cadf::comms::IMessage](include/comms/message/Message.h), though more specifically [cadf::comms::AbstractMessage](include/comms/message/Message.h). [AbstractMessage](include/comms/message/Message.h) is a templated class, where the data the message is to contain is specified via the template parameter with the expectation being that it will be a `struct`. Thus to create a new message, simply extend [AbstractMessage](include/comms/message/Message.h)
+
+```C++
+struct MyData {
+     int myIntValue;
+     std::string myStringValue;
+     MyCommonDataStruct myCommonData;
+};
+
+class MyMessage: public cadf::comms::AbstractDataMessage<MyData> {
+public:
+     MyMessage(): cadf::comms::AbstractDataMessage<MyData>("MyMessage", MyData()) {}
+     MyMessage(const MyData &data): cadf::comms::AbstractDataMessage<MyData>("MyMessage", data) {}
+     
+protected:
+     AbstractDataMessage<MyData> newInstance() const {
+          return new MyMessage(m_data);
+     }
+};
+```
+
+_Note: a default constructor __must__ be provided and the __newInstance()__ method implemented. Anything beyond that is up to target design requirements._
+
+#### Message Serialization and Deserialization
+
+For the provided protocols each message data `struct` needs to provide serialization and deserialization overloads.
+
+##### Binary Protocol
+
+The [Binary Protocol](include/comms/network/serializer/binary/Serializer.h) being an excedingly simply protocol, where the data is copied in its binary format to the message, requires little in the way of "massaging". The protocol provides mechanisms for most common situations, though overrides must be provided for custom data types. The process is started from [cadf::comms::binary::MessageSerializer](include/comms/network/serializer/binary/Serializer.h) and [cadf::comms::binary::MessageDeserializer](include/comms/network/serializer/binary/Serializer.h) for serialization and deserialization (respectively). These then make use of [cadf::comms::binary::DataSerializer](include/comms/network/serializer/binary/Serializer.h) templates classes to perform the actual serialization and deserialization work. Overloads of the [DataSerializer](include/comms/network/serializer/binary/Serializer.h) are provided to account for a number of different data types, including:
+
+* Plain Old Datatypes
+* Strings
+* Pointers
+* Arrays
+* Standard iteratables (i.e.: `vector`, `map`)
+
+For anything else, custom [DataSerializer](include/comms/network/serializer/binary/Serializer.h) overrides must be provided, such that `cadf::comms::binary::sizeOfData()`, `cadf::comms::binary::serializeData`, and `cadf::comms::binary::deserializeData` are implemented for the data type in question.
+
+```C++
+/*
+ * Binary Protocol
+ */
+template<>
+size_t cadf::comms::binary::sizeOfData<MyData>(const MyData &data) {
+     return sizeOf<int>(data.myIntValue) + sizeOf<std::string>(data.myStringValue) + 
+          sizeOfData<MyCommonDataStruct>(data.myCommonData);
+}
+
+template<>
+void cadf::comms::binary::serializeData<MyData>(const MyData& data, cadf::comms::OutputBuffer *buffer) {
+    serializeData<int>(data.myIntValue, sizeof(int));
+    serializeData<std::string>(data.myStringValue, buffer);
+    serializeData<MyCommonDataStruct>(data.myCommonData, buffer);
+}
+
+template<>
+MyData cadf::comms::binary::deserializeData<TestData>(cadf::comms::InputBuffer *buffer) {
+    MyData data;
+    data.myIntValue = deserializeData<int>(buffer);
+    data.myStringValue = deserializeData<std::string>(buffer);
+    data.myCommonValue = deserializeData<MyCommonDataStruct>(buffer);
+    return data;
+}
+```
+
+##### JSON Protocol
+
 ### Handshake
 
 The handshake is an important mechanism of establishing a connection between two entities ([Node](include/comms/node/Node.h) and [ServerBus](include/comms/network/server/ServerBus.h) in this case), by trading a series of messages up front to ensure that proper communication can be established. On the server side this is handled via the [cadf::comms::HandshakeHandler](include/comms/network/handshake/HandshakeHandler.h), which uses a [cadf::comms::IHandshakeFactory](include/comms/network/handshake/Handshake.h) to create a [cadf::comms::IHandshake](include/comms/network/handshake/Handshake.h) which will perform the handshake itself. A provided [cadf::comms::IHandshakeCompleteListener](include/comms/network/handshake/Handshake.h) is notified when the handshake is successfully completed. For the purpose of customizability the handshake classes are all pure virtual (interfaces), with one default implementation provided in the form of the [cadf::comms::ProtocolHandshakeFactory](include/comms/network/handshake/ProtocolHandshake.h) and [cadf::comms::ProtocolHandshake](include/comms/network/handshake/ProtocolHandshake.h). These will perform a handshake in the desired protocol, where:
