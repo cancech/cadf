@@ -11,14 +11,13 @@
 namespace cadf::comms {
 
     /**
-     * Basic server implementation, providing all of the necessary pieces required to start a server bus in a convenient
-     * and easy to use package.
+     * Basic server implementation for a Bus to which remote nodes can connect to, and through which the nodes can communicate together.
      *
      * @template PROTOCOL the class which defines how messages will be (de)serialized for transmission over the network
      * @template SUPPORTED_MESSAGES... arbitrary list of messages that are to be supported by the server. Each must extend from the base IMessage class.
      */
     template<class PROTOCOL, class ... SUPPORTED_MESSAGES>
-    class BasicServer {
+    class BasicNodeBusServer {
         public:
 
             /**
@@ -28,7 +27,7 @@ namespace cadf::comms {
              * @param maxDataMsgSize size_t the maximum size for a message to support (defaults to AUTO_SIZE, allowing for unlimited message size)
              * @param maxHandshakeMsgSize size_t the maximum size to use for messages employed during handshaking (defaults to 256)
              */
-            BasicServer(IBus *bus, const NetworkInfo &info, size_t maxDataMsgSize = MessageConstants::AUTO_SIZE, size_t maxHandshakeMsgSize = 256) :
+            BasicNodeBusServer(IBus *bus, const NetworkInfo &info, size_t maxDataMsgSize = MessageConstants::AUTO_SIZE, size_t maxHandshakeMsgSize = 256) :
                     m_msgFactory(maxDataMsgSize), m_connectionFactory(&m_msgFactory),
                     m_handshakeFactory(maxHandshakeMsgSize, &m_msgFactory),
                     m_handshakeHandler(&m_handshakeFactory),

@@ -208,7 +208,7 @@ The handshake is an important mechanism of establishing a connection between two
 
 ### Server
 
-The [Bus](include/comms/bus/Bus.h) becomes a server into which the various [Nodes](include/comms/node/Node.h) connect as clients. [cadf::comms::ServerBus](include/comms/network/server/ServerBus.h) provides an implementation of middle layer that binds a server to the [Bus](include/comms/bus/Bus.h). To account for the majority of cases, an implementation is provided in the form of [cadf::comms::BasicServer](include/comms/network/server/BasicServer.h). Creating an instance of this will perform all of the necessary work to create a server, and the necessary controls to manage it. The template parameters are the only customization required to configure the server (first parameter is the desired protocol as per above, and the rest are the messages that the server is to support). Starting the server is as simple as calling `start()` and stopping it `stop()`.
+The [Bus](include/comms/bus/Bus.h) becomes a server into which the various [Nodes](include/comms/node/Node.h) connect as clients. [cadf::comms::ServerBus](include/comms/network/server/ServerBus.h) provides an implementation of middle layer that binds a server to the [Bus](include/comms/bus/Bus.h). To account for the majority of cases, an implementation is provided in the form of [cadf::comms::BasicNodeBusServer](include/comms/network/BasicNodeBusServer.h). Creating an instance of this will perform all of the necessary work to create a server, and the necessary controls to manage it. The template parameters are the only customization required to configure the server (first parameter is the desired protocol as per above, and the rest are the messages that the server is to support). Starting the server is as simple as calling `start()` and stopping it `stop()`.
 
 ```C++
 // Define the details of the network connection for the server
@@ -217,19 +217,19 @@ myNetworkInfo.ipVersion = cadf::comms::NetworkInfo::IPv4;
 myNetworkInfo.netAddress = "127.0.0.1"; // The IP Address on which to accept client connections
 myNetworkInfo.port = 1234; // The port on which to accept client connections
 
-cadf::comms::BasicServer<JSONProtocol, MyMessage1, MyMessage2, MyMessage3> myServer(myNetworkInfo);
+cadf::comms::BasicNodeBusServer<JSONProtocol, MyMessage1, MyMessage2, MyMessage3> myServer(myNetworkInfo);
 myServer.start();
 myServer.stop();
 ```
 
-It is also possible to extend the [BasicServer](include/comms/network/server/BasicServer.h) class, with the same ideas as above applying. The only item of note, is that the supported messages can still be provided via the template parameter as per above, or by overriding the `registerMessages()` method.
+It is also possible to extend the [BasicNodeBusServer](include/comms/network/BasicNodeBusServer.h) class, with the same ideas as above applying. The only item of note, is that the supported messages can still be provided via the template parameter as per above, or by overriding the `registerMessages()` method.
 
 ```C++
 template<class PROTOCOL>
-class MyServer: cadf::comms::BasicServer<PROTOCOL> {
+class MyServer: cadf::comms::BasicNodeBusServer<PROTOCOL> {
 
     public:
-        MyServer(const cadf::comms::NetworkInfo &myNetworkInfo): cadf::comms::BasicServer<PROTOCOL>(myNetworkInfo) {}
+        MyServer(const cadf::comms::NetworkInfo &myNetworkInfo): cadf::comms::BasicNodeBusServer<PROTOCOL>(myNetworkInfo) {}
         
     protected:
         void registerMessages(cadf::comms::MessageFactory<PROTOCOL> *msgFactory) {
@@ -245,7 +245,7 @@ Note that if the `registerMessages()` approach is taken when extending the [Basi
 
 #### Custom Server
 
-To create a custom server, then all of the individual pieces that the [BasicServer](include/comms/network/server/BasicServer.h) takes care of, must be performed manually. Use [BasicServer](include/comms/network/server/BasicServer.h) as a starting point, which effectively does the following:
+To create a custom server, then all of the individual pieces that the [BasicNodeBusServer](include/comms/network/BasicNodeBusServer.h) takes care of, must be performed manually. Use [BasicNodeBusServer](include/comms/network/BasicNodeBusServer.h) as a starting point, which effectively does the following:
 
 ```C++
 // Define the details of the network connection for the server
@@ -274,10 +274,11 @@ Where:
 * [cadf::comms::ServerConnectionHandler](include/comms/network/socket/ServerConnectionHandler.h) sits between the actual server socket and the [Bus](include/comms/bus/Bus.h), handling the lifecycle of client connection (triggering the handshake on connection, creating the internal connection representation on successful handshake, and cleanup on client disconnect)
 * [cadf::comms::TcpServerSocket](include/comms/network/socket/TcpServerSocket.h) the actual network socket into which the clients will connect
 
-To start the server and allow for clients to connect, simply connect the socket
+To start the server and allow for clients to connect, simply connect the socket. Disconnect the socket to stop the server.
 
 ```C++
 myServerSocket.connect();
+myServerSocket.disconnect();
 ```
 
 ### Client
