@@ -42,6 +42,11 @@ namespace cadf::comms {
             }
 
             /**
+             * DTOR
+             */
+            virtual ~BasicNodeBusServer() = default;
+
+            /**
              * Start the server
              *
              * @return bool true if the server was started successfully (or already started)
