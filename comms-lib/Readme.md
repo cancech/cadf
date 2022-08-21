@@ -241,7 +241,7 @@ class MyServer: cadf::comms::BasicNodeBusServer<PROTOCOL> {
 };
 ```
 
-Note that if the `registerMessages()` approach is taken when extending the [BasicServer](include/comms/network/server/BasicServer.h), both of the steps outlined must be performed.
+Note that if the `registerMessages()` approach is taken when extending the [BasicNodeBusServer](include/comms/network/BasicNodeBusServer.h), both of the steps outlined must be performed.
 
 #### Custom Server
 
@@ -257,7 +257,7 @@ myNetworkInfo.port = 1234; // The port on which to accept client connections
 // Create the mechanism for handling client connections
 cadf::comms::ProtocolHandshakeFactory<PROTOCOL> myHandshakeFactory(myMaxMsgSize, myMsgFactory);
 cadf::comms::HandshakeHandler myHandshakeHandler(myHandshakeFactory);
-cadf::comms::BasicServerConnectionFactory<PROTOCOL> myConnectionFactory(myMsgFactory);
+cadf::comms::BasicNodeBusServer<PROTOCOL> myConnectionFactory(myMsgFactory);
 cadf::comms::ServerConnectionHandler myConnectionHandler(&myHandshakeHandler, &myConnectionFactory);
 
 // Create the bus itself
@@ -283,7 +283,44 @@ myServerSocket.disconnect();
 
 ### Client
 
-Once the ServerBus is up and running, a [Node](include/comms/node/Node.h) can connect to it.
+Once the ServerBus is up and running, a [Node](include/comms/node/Node.h) can connect to it. As is the case with the server, a basic client is provided in the form of [cadf::comms::BasicNodeClient](include/comms/network/BasicNodeClient.h) which is expected to cover most/all circumstances. It requires to details of the [Node](include/comms/node/Node.h) to be provided (type and instance), how to connect to the server, and the maximum allowed message size. Once created, `connect()` and `disconnect()` can be used to establish and destroy the connection to the server. Much like with the [BasicNodeBusServer](include/comms/network/BasicNodeBusServer.h), the template parameters are used to specify the specific protocol to use, and which messages are to be used for communicating with the server.
+
+```C++
+// Define the details of where to connect to the server
+cadf::comms::NetworkInfo myNetworkInfo;
+myNetworkInfo.ipVersion = cadf::comms::NetworkInfo::IPv4;
+myNetworkInfo.netAddress = "127.0.0.1"; // The IP Address on which to accept client connections
+myNetworkInfo.port = 1234; // The port on which to accept client connections
+
+cadf::comms::BasicNodeClient<JSONProtocol, MyMessage1, MyMessage2, MyMessage3> myClient(myType, myInstance, myNetworkInfo, myMaxMsgSize);
+myClient.connect();
+```
+Much in the same as as with the [BasicNodeBusServer](include/comms/network/BasicNodeBusServer.h), the [BasicNodeClient](include/comms/network/BasicNodeClient.h) can also be extended, in which case supported messages can be provided via the template parameter, or by overriding the `registerMessages()` method.
+
+```C++
+template<class PROTOCOL>
+class MyNodeClient : public cadf::comms::BasicNodeClient<PROTOCOL> {
+    public:
+        TestNetNode(int type, int instance, const cadf::comms::NetworkInfo &info) :
+            cadf::comms::BasicNodeClient<PROTOCOL>(type, instance, info, 1024) {
+        }
+        
+        void registerMessages(cadf::comms::MessageFactory<PROTOCOL> *msgFactory) {
+            // Step 1 - Define the messages that are to be supported
+            cadf::comms::MessageRegistry<PROTOCOL, MyMessage1, MyMessage2, MyMessage3> msgRegistry;
+            // Step 2 - Register them with the factory
+            msgRegistry.registerMessages(msgFactory);
+        }
+};
+```
+
+Note that if the `registerMessages()` approach is taken when extending the [BasicNodeClient](include/comms/network/BasicNodeClient.h), both of the steps outlined must be performed.
+
+Regardless of the approach the operation and usage of [Node](include/comms/node/Node.h) still applies, with the only distinction being the need to access it from the [BasicNodeClient](include/comms/network/BasicNodeClient.h) rather than the [Node](include/comms/node/Node.h) directly.
+
+#### Custom Client
+
+To create a custom client, then all of the individual pieces that the [BasicNodeClient](include/comms/network/BasicNodeClient.h) takes care of, must be performed manually. Use [BasicNodeClient](include/comms/network/BasicNodeClient.h) as a starting point, which effectively does the following:
 
 ```C++
 // Define the details of where to connect to the server
