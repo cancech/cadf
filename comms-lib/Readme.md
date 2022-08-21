@@ -71,11 +71,11 @@ Meaning when a given type of message is received, the [Bridge Node](include/comm
 
 ## Local Bus
 
-The simplist approach toward creating this form of application, is if the [Bus](include/comms/bus/Bus.h) and all [Nodes](include/comms/node/Node.h) live within the same application (such as via plugins, where each plugin is a separate [Node](include/comms/node/Node.h)). For this purpose [cadf::comms::LocalBasicBus](include/comms/bus/LocalBasicBus.h) and [cadf::comms::LocalThreadedBus](include/comms/bus/LocalThreadedBus.h) are provided, with the distinction that [LocalThreadedBus](include/comms/bus/LocalThreadedBus.h) incorporates a [ThreadPool](../thread-lib) to perform message routing in a separate thread from the sender, while [LocalThreadedBus](include/comms/bus/LocalThreadedBus.h) performs the message routing in the same thread as the sender. To create a Local Bus, simply call the constructor of the desired class, no additional initialization required.
+The simplist approach toward creating this form of application, is if the [Bus](include/comms/bus/Bus.h) and all [Nodes](include/comms/node/Node.h) live within the same application (such as via plugins, where each plugin is a separate [Node](include/comms/node/Node.h)). For this purpose [cadf::comms::BasicBus](include/comms/bus/BasicBus.h) and [cadf::comms::ThreadedBus](include/comms/bus/ThreadedBus.h) are provided, with the distinction that [ThreadedBus](include/comms/bus/ThreadedBus.h) incorporates a [ThreadPool](../thread-lib) to perform message routing in a separate thread from the sender, while [BasicBus](include/comms/bus/BasicBus.h) performs the message routing in the same thread as the sender. To create a Local Bus, simply call the constructor of the desired class, no additional initialization required.
 
 ```C++
-cadf::comms:LocalBasicBus nonThreadedBus;
-cadf::comms::LocalThreadedBus threadedBus(myThreadPool);
+cadf::comms:BasicBus nonThreadedBus;
+cadf::comms::ThreadedBus threadedBus(myThreadPool);
 ```
 
 To create a [Node](include/comms/node/Node.h) and register it with the local bus of choice, simply instantiate the [Node](include/comms/node/Node.h) with a [cadf::comms::LocalConnection](include/comms/connection/LocalConnection.h). As part of the [LocalConnection](include/comms/connection/LocalConnection.h) initialization, it must be registered with the desired [Bus](include/comms/bus/Bus.h). The last step to take participate in message passing on the [Bus](include/comms/bus/Bus.h) is to connect to it.
@@ -97,7 +97,7 @@ Destroying the [Node](include/comms/node/Node.h) will automatically trigger a di
 
 ## Remote Bus
 
-With a remote bus, the [Bus](include/comms/bus/Bus.h) and [Nodes](include/comms/node/Node.h) are distributed (could be different machines, containers, or what have you) and require a network connection in order to communicate with each other. While the principle described above for the Local Bus is largely unchanged, the inclusion of network communication by necessity translates into significantly increased complexity.
+With a remote bus, the [Bus](include/comms/bus/Bus.h) and [Nodes](include/comms/node/Node.h) are distributed (could be different machines, containers, or what have you) and require a network connection in order to communicate with each other. While the principle described above for the Local Bus is largely unchanged, the inclusion of network communication by necessity translates into significantly increased complexity. At its core the [BasicBus](include/comms/bus/BasicBus.h) and [ThreadedBus](include/comms/bus/ThreadedBus.h) are still used to perform message routing, however the mechanism through which the messages reach the bus is vastly different.
 
 ### Protocol
 
