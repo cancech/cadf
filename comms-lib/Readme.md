@@ -208,7 +208,44 @@ The handshake is an important mechanism of establishing a connection between two
 
 ### Server
 
-The [Bus](include/comms/bus/Bus.h) becomes a server into which the various [Nodes](include/comms/node/Node.h) connect as clients. [cadf::comms::ServerBus](include/comms/network/server/ServerBus.h) provides an implementation of middle layer that binds a server to the [Bus](include/comms/bus/Bus.h). Creating a [ServerBus](include/comms/network/server/ServerBus.h) is a multistep process as shown in the following example:
+The [Bus](include/comms/bus/Bus.h) becomes a server into which the various [Nodes](include/comms/node/Node.h) connect as clients. [cadf::comms::ServerBus](include/comms/network/server/ServerBus.h) provides an implementation of middle layer that binds a server to the [Bus](include/comms/bus/Bus.h). To account for the majority of cases, an implementation is provided in the form of [cadf::comms::BasicServer](include/comms/network/server/BasicServer.h). Creating an instance of this will perform all of the necessary work to create a server, and the necessary controls to manage it. The template parameters are the only customization required to configure the server (first parameter is the desired protocol as per above, and the rest are the messages that the server is to support). Starting the server is as simple as calling `start()` and stopping it `stop()`.
+
+```C++
+// Define the details of the network connection for the server
+cadf::comms::NetworkInfo myNetworkInfo;
+myNetworkInfo.ipVersion = cadf::comms::NetworkInfo::IPv4;
+myNetworkInfo.netAddress = "127.0.0.1"; // The IP Address on which to accept client connections
+myNetworkInfo.port = 1234; // The port on which to accept client connections
+
+cadf::comms::BasicServer<JSONProtocol, MyMessage1, MyMessage2, MyMessage3> myServer(myNetworkInfo);
+myServer.start();
+myServer.stop();
+```
+
+It is also possible to extend the [BasicServer](include/comms/network/server/BasicServer.h) class, with the same ideas as above applying. The only item of note, is that the supported messages can still be provided via the template parameter as per above, or by overriding the `registerMessages()` method.
+
+```C++
+template<class PROTOCOL>
+class MyServer: cadf::comms::BasicServer<PROTOCOL> {
+
+    public:
+        MyServer(const cadf::comms::NetworkInfo &myNetworkInfo): cadf::comms::BasicServer<PROTOCOL>(myNetworkInfo) {}
+        
+    protected:
+        void registerMessages(cadf::comms::MessageFactory<PROTOCOL> *msgFactory) {
+            // Step 1 - Define the messages that are to be supported
+            cadf::comms::MessageRegistry<PROTOCOL, MyMessage1, MyMessage2, MyMessage3> msgRegistry;
+            // Step 2 - Register them with the factory
+            msgRegistry.registerMessages(msgFactory);
+        }
+};
+```
+
+Note that if the `registerMessages()` approach is taken when extending the [BasicServer](include/comms/network/server/BasicServer.h), both of the steps outlined must be performed.
+
+#### Custom Server
+
+To create a custom server, then all of the individual pieces that the [BasicServer](include/comms/network/server/BasicServer.h) takes care of, must be performed manually. Use [BasicServer](include/comms/network/server/BasicServer.h) as a starting point, which effectively does the following:
 
 ```C++
 // Define the details of the network connection for the server
