@@ -6,7 +6,7 @@
 #include <boost/test/unit_test.hpp>
 #include <fakeit.hpp>
 
-#include "comms/bus/LocalBasicBus.h"
+#include "comms/bus/BasicBus.h"
 
 
 // Helper classes for the LocalBasicBusTest
@@ -53,7 +53,7 @@ namespace LocalBasicBusTest {
 
     struct TestFixtureAllConnectionsConnected: public SetupMocks {
 
-            cadf::comms::LocalBasicBus bus;
+            cadf::comms::BasicBus bus;
 
             TestFixtureAllConnectionsConnected() {
                 // Establish the connections

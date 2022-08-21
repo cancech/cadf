@@ -8,10 +8,10 @@
 #include "comms/node/BridgeNode.h"
 #include "comms/node/Node.h"
 #include "comms/connection/LocalConnection.h"
-#include "comms/bus/LocalBasicBus.h"
+#include "comms/bus/BasicBus.h"
 #include "comms/network/serializer/local/Serializer.h"
 
-#include <TestMessage.h>
+#include "TestMessage.h"
 
 // Helper classes for the BridgeNodeIT
 namespace BridgeNodeIT {
@@ -115,7 +115,7 @@ namespace BridgeNodeIT {
             static MessageFactoryCreator factoryCreator;
 
             /** The bus that the nodes will communicate across */
-            cadf::comms::LocalBasicBus bus;
+            cadf::comms::BasicBus bus;
             /** The connection for node1 to the bus */
             cadf::comms::LocalConnection node1Connection;
             /** The connection for node2 to the bus */

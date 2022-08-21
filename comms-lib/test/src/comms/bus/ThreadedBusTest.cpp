@@ -1,10 +1,11 @@
+
 #define BOOST_TEST_DYN_LINK
 #ifdef STAND_ALONE
 #   define BOOST_TEST_MODULE Main
 #endif
 #include <boost/test/unit_test.hpp>
 
-#include "comms/bus/LocalThreadedBus.h"
+#include "comms/bus/ThreadedBus.h"
 #include "comms/Constants.h"
 #include "TestMessage.h"
 
@@ -65,7 +66,7 @@ namespace LocalThreadedBusTest {
 
     struct TestFixtureAllConnectionsConnected: public SetupMocks {
 
-            cadf::comms::LocalThreadedBus bus;
+            cadf::comms::ThreadedBus bus;
 
             TestFixtureAllConnectionsConnected() : SetupMocks(), bus(&mockThreadPool.get()) {
                 // Establish the connections

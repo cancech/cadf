@@ -1,7 +1,7 @@
 #ifndef INCLUDE_TESTSERVER_H_
 #define INCLUDE_TESTSERVER_H_
 
-#include "comms/bus/LocalBasicBus.h"
+#include "comms/bus/BasicBus.h"
 #include "comms/network/server/BasicServer.h"
 #include "TestMessage.h"
 
@@ -20,7 +20,7 @@ namespace test {
             }
 
         private:
-            cadf::comms::LocalBasicBus m_bus;
+            cadf::comms::BasicBus m_bus;
     };
 
 }

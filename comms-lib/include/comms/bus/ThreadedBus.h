@@ -1,7 +1,7 @@
 #ifndef CAMB_BUS_LOCALTHREADEDBUS_H_
 #define CAMB_BUS_LOCALTHREADEDBUS_H_
 
-#include <thread/ThreadPool.h>
+#include "thread/ThreadPool.h"
 #include "comms/bus/Bus.h"
 
 namespace cadf::comms {
@@ -10,7 +10,7 @@ namespace cadf::comms {
      * A local bus that uses a thread pool to help process the messages faster (and break the execution dependency between the sending thread
      * and the receiving thread).
      */
-    class LocalThreadedBus: public AbstractBus {
+    class ThreadedBus: public AbstractBus {
 
         public:
             /**
@@ -20,12 +20,12 @@ namespace cadf::comms {
              *
              * @param *pool IThreadPool pointer to the thread pool that is to be used
              */
-            LocalThreadedBus(cadf::thread::IThreadPool *pool);
+            ThreadedBus(cadf::thread::IThreadPool *pool);
 
             /**
              * DTOR
              */
-            virtual ~LocalThreadedBus();
+            virtual ~ThreadedBus();
 
             /**
              * Sends the message from the sender to the rest of the bus, as per the routing information in the packet.

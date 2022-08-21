@@ -1,3 +1,4 @@
+
 #define BOOST_TEST_DYN_LINK
 #ifdef STAND_ALONE
 #   define BOOST_TEST_MODULE Main
@@ -7,7 +8,7 @@
 #include "comms/node/Node.h"
 #include "comms/connection/LocalConnection.h"
 #include "comms/connection/ConnectionException.h"
-#include "comms/bus/LocalBasicBus.h"
+#include "comms/bus/BasicBus.h"
 #include "comms/network/serializer/local/Serializer.h"
 
 #include "TestMessage.h"
@@ -122,7 +123,7 @@ namespace BasicLocalNodeITTest {
             cadf::comms::Node *node2_1;
             cadf::comms::Node *node2_2;
 
-            cadf::comms::LocalBasicBus bus;
+            cadf::comms::BasicBus bus;
 
             cadf::comms::MessageRegistry<cadf::comms::local::LocalProtocol, TestMessage1, TestMessage2> msgRegistry;
             cadf::comms::MessageFactory<cadf::comms::local::LocalProtocol> msgFactory;

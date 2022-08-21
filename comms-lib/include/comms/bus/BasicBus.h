@@ -10,13 +10,13 @@ namespace cadf::comms {
      * to all other available connections. Makes sure that the sender is not among the
      * receivers.
      */
-    class LocalBasicBus: public AbstractBus {
+    class BasicBus: public AbstractBus {
 
         public:
             /**
              * DTOR
              */
-            virtual ~LocalBasicBus() = default;
+            virtual ~BasicBus() = default;
 
             /**
              * Send a message from an existing connection. The message will be routed to the desired recipient(s).
