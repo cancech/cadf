@@ -7,7 +7,6 @@
 #include <iostream>
 #include <memory>
 
-#include "comms/Constants.h"
 #include "comms/network/serializer/Serializer.h"
 #include "comms/message/MessagePacket.h"
 #include "comms/message/MessageException.h"
@@ -45,10 +44,9 @@ namespace cadf::comms {
             /**
              * CTOR
              *
-             * @param bufferSize size_t unsigned integer size to use for the buffer when serializing messages. Defaults to MessageConstants::AUTO_SIZE, which
-             *                          will automatically determine the size of the buffer based on the size of the serialized data
+             * @param bufferSize size_t unsigned integer size to use for the buffer when serializing messages
              */
-            MessageFactory(size_t bufferSize = MessageConstants::AUTO_SIZE): m_bufferSize(bufferSize) {
+            MessageFactory(size_t bufferSize): m_bufferSize(bufferSize) {
             }
 
             /**
@@ -116,7 +114,7 @@ namespace cadf::comms {
             virtual OutputBuffer* serializeMessage(const MessagePacket &packet) const {
                 const IMessage *msg = packet.getMessage();
                 std::unique_ptr<ISerializer> serializer(m_serializers.at(msg->getType())->buildSerializer(msg, packet.getRecipientType(), packet.getRecipientInstance()));
-                OutputBuffer *out = new OutputBuffer(m_bufferSize == MessageConstants::AUTO_SIZE ? serializer->getSize() : m_bufferSize);
+                OutputBuffer *out = new OutputBuffer(std::min(serializer->getSize(), m_bufferSize));
                 try {
                     serializer->serialize(out);
                     return out;

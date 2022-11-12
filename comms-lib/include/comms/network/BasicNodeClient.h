@@ -27,7 +27,7 @@ namespace cadf::comms {
              * @param &info const NetworkInfo providing the details of where the server should listen for client connections
              * @param maxDataMsgSize size_t the maximum size for a message to support
              */
-            BasicNodeClient(int type, int instance, const NetworkInfo &info, size_t maxMessageSize) : m_msgFactory(), m_clientSocket(info, maxMessageSize), m_client(&m_clientSocket),
+            BasicNodeClient(int type, int instance, const NetworkInfo &info, size_t maxMessageSize) : m_msgFactory(512), m_clientSocket(info, maxMessageSize), m_client(&m_clientSocket),
                     m_clientConnection(type, instance, &m_msgFactory, &m_client), m_clientNode(&m_clientConnection) {
                 // Register the message specified via the template
                 MessageRegistry<PROTOCOL, SUPPORTED_MESSAGES...> msgRegistry;

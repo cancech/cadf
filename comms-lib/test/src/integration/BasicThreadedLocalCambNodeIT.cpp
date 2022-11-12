@@ -61,7 +61,7 @@ namespace BasicThreadedLocalNodeITTest {
      */
     struct TestFixture {
 
-            TestFixture() : threadPool(), bus(&threadPool), msgRegistry(), msgFactory(), node1_1Connection(1, 1, &msgFactory), node1_2Connection(1, 2, &msgFactory),
+            TestFixture() : threadPool(), bus(&threadPool), msgRegistry(), msgFactory(512), node1_1Connection(1, 1, &msgFactory), node1_2Connection(1, 2, &msgFactory),
                     node2_1Connection(2, 1, &msgFactory), node2_2Connection(2, 2, &msgFactory) {
                 BOOST_CHECK_EQUAL(1, node1_1Connection.getType());
                 BOOST_CHECK_EQUAL(1, node1_1Connection.getInstance());

@@ -24,10 +24,10 @@ namespace cadf::comms {
              * CTOR
              *
              * @param &info const NetworkInfo providing the details of where the server should listen for client connections
-             * @param maxDataMsgSize size_t the maximum size for a message to support (defaults to AUTO_SIZE, allowing for unlimited message size)
+             * @param maxDataMsgSize size_t the maximum size for a message to support
              * @param maxHandshakeMsgSize size_t the maximum size to use for messages employed during handshaking (defaults to 256)
              */
-            BasicNodeBusServer(IBus *bus, const NetworkInfo &info, size_t maxDataMsgSize = MessageConstants::AUTO_SIZE, size_t maxHandshakeMsgSize = 256) :
+            BasicNodeBusServer(IBus *bus, const NetworkInfo &info, size_t maxDataMsgSize, size_t maxHandshakeMsgSize = 256) :
                     m_msgFactory(maxDataMsgSize), m_connectionFactory(&m_msgFactory),
                     m_handshakeFactory(maxHandshakeMsgSize, &m_msgFactory),
                     m_handshakeHandler(&m_handshakeFactory),

@@ -52,7 +52,7 @@ namespace BridgeNodeIT {
             /**
              * CTOR - registers the messages with the factory
              */
-            MessageFactoryCreator() {
+            MessageFactoryCreator(): msgFactory(512) {
                 msgRegistry.registerMessages(&msgFactory);
             }
 

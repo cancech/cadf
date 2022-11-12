@@ -10,7 +10,7 @@ namespace test {
     template<class PROTOCOL>
     class TestServer : public cadf::comms::BasicNodeBusServer<PROTOCOL, TestMessage1, TestMessage2> {
         public:
-            TestServer(const cadf::comms::NetworkInfo &info) : m_bus(), cadf::comms::BasicNodeBusServer<PROTOCOL, TestMessage1, TestMessage2>(&m_bus, info) {
+            TestServer(const cadf::comms::NetworkInfo &info) : m_bus(), cadf::comms::BasicNodeBusServer<PROTOCOL, TestMessage1, TestMessage2>(&m_bus, info, 128) {
             }
 
         protected:

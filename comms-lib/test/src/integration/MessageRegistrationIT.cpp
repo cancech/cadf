@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_SUITE(MessageRegistryIT_Test_Suite)
  */
 BOOST_AUTO_TEST_CASE(RegisterAndCreateMessages) {
     // Register the messages
-    cadf::comms::MessageFactory<cadf::comms::local::LocalProtocol> factory;
+    cadf::comms::MessageFactory<cadf::comms::local::LocalProtocol> factory(512);
     cadf::comms::MessageRegistry<cadf::comms::local::LocalProtocol, TestMessage1, TestMessage3> registry;
     registry.registerMessages(&factory);
 
