@@ -22,7 +22,7 @@ namespace BridgeNodeTest {
                 fakeit::When(Method(mockInternalConnection, removeMessageListener)).AlwaysReturn();
                 fakeit::When(Method(mockInternalConnection, connect)).AlwaysReturn(true);
                 fakeit::When(Method(mockInternalConnection, disconnect)).AlwaysReturn(true);
-                fakeit::When(Method(mockInternalConnection, sendMessage)).AlwaysReturn(true);
+                fakeit::Fake(Method(mockInternalConnection, sendMessage));
 
                 fakeit::When(Method(mockExternalConnection, addMessageListener)).AlwaysDo([this](cadf::comms::IMessageListener *listener) {
                     externalConnMsgListener = listener;
@@ -30,7 +30,7 @@ namespace BridgeNodeTest {
                 fakeit::When(Method(mockExternalConnection, removeMessageListener)).AlwaysReturn();
                 fakeit::When(Method(mockExternalConnection, connect)).AlwaysReturn(true);
                 fakeit::When(Method(mockExternalConnection, disconnect)).AlwaysReturn(true);
-                fakeit::When(Method(mockExternalConnection, sendMessage)).AlwaysReturn(true);
+                fakeit::Fake(Method(mockExternalConnection, sendMessage));
 
                 fakeit::When(Method(mockPacket1, getMessage)).AlwaysReturn(&mockMessage1.get());
                 fakeit::When(Method(mockPacket2, getMessage)).AlwaysReturn(&mockMessage2.get());

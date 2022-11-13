@@ -76,9 +76,9 @@ namespace cadf::comms {
              * @param recipientType int the type of recipient for the message
              * @param recipientInstance int the instance of the type of recipient
              *
-             * @return bool true if the message was sent successfully
+             * A cadf::comms::MessageSendingException will be thrown if an issue is encountered attempting to send the message.
              */
-            virtual bool sendMessage(IMessage *msg, int recipientType, int recipientInstance);
+            virtual void sendMessage(IMessage *msg, int recipientType, int recipientInstance);
 
         protected:
             /**

@@ -23,7 +23,7 @@ namespace ClientConnectionTest {
                 fakeit::When(Method(mockClient, isConnected)).AlwaysReturn(false);
                 fakeit::When(Method(mockClient, connect)).AlwaysReturn(true);
                 fakeit::When(Method(mockClient, disconnect)).AlwaysReturn(true);
-                fakeit::When(Method(mockClient, send)).AlwaysReturn(true);
+                fakeit::Fake(Method(mockClient, send));
                 fakeit::Fake(Method(mockListener, messageReceived));
 
                 fakeit::When(Method(mockFactory, serializeMessage)).AlwaysDo([&](const cadf::comms::MessagePacket &packet) {
@@ -112,9 +112,11 @@ BOOST_AUTO_TEST_SUITE(ClientConnection_Test_Suite)
         BOOST_CHECK_EQUAL(false, conn.isConnected());
         fakeit::Verify(Method(mockClient, isConnected)).Exactly(1);
 
-        BOOST_CHECK_EQUAL(false, conn.sendMessage(NULL));
+        TestMessage1 msg;
+        BOOST_REQUIRE_THROW(conn.sendMessage(&msg), cadf::comms::MessageSendingException);
         fakeit::Verify(Method(mockClient, isConnected)).Exactly(2);
-        BOOST_CHECK_EQUAL(false, conn.sendPacket(NULL));
+        cadf::comms::MessagePacket packet(&msg, 0, 0);
+        BOOST_REQUIRE_THROW(conn.sendPacket(&packet), cadf::comms::MessageSendingException);
         fakeit::Verify(Method(mockClient, isConnected)).Exactly(3);
     }
 
@@ -130,7 +132,7 @@ BOOST_AUTO_TEST_SUITE(ClientConnection_Test_Suite)
 
         // Send the message
         TestMessage1 msg;
-        BOOST_CHECK_EQUAL(true, conn.sendMessage(&msg));
+        BOOST_REQUIRE_NO_THROW(conn.sendMessage(&msg));
         fakeit::Verify(Method(mockClient, isConnected)).Exactly(4);
         fakeit::Verify(Method(mockFactory, serializeMessage)).Exactly(1);
         fakeit::Verify(Method(mockClient, send).Using(lastUsedOutBuffer)).Exactly(1);
@@ -138,7 +140,7 @@ BOOST_AUTO_TEST_SUITE(ClientConnection_Test_Suite)
         // Send the packet
         TestMessage2 msg2;
         cadf::comms::MessagePacket packet(&msg2, 1, 2);
-        BOOST_CHECK_EQUAL(true, conn.sendPacket(&packet));
+        BOOST_REQUIRE_NO_THROW(conn.sendPacket(&packet));
         fakeit::Verify(Method(mockClient, isConnected)).Exactly(5);
         fakeit::Verify(Method(mockFactory, serializeMessage)).Exactly(2);
         fakeit::Verify(Method(mockClient, send).Using(lastUsedOutBuffer)).Exactly(1);

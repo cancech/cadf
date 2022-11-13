@@ -72,21 +72,20 @@ namespace cadf::comms {
     /**
      * Send a message to the bus.
      */
-    bool LocalConnection::sendMessage(const IMessage *msg, int recipientType, int recipientInstance) {
+    void LocalConnection::sendMessage(const IMessage *msg, int recipientType, int recipientInstance) {
         MessagePacket packet(msg, recipientType, recipientInstance);
-        return sendPacket(&packet);
+        sendPacket(&packet);
     }
 
-    bool LocalConnection::sendPacket(const MessagePacket *packet) {
+    void LocalConnection::sendPacket(const MessagePacket *packet) {
         verifyBusRegistration("send message");
 
         if (!isConnected())
-            return false;
+            throw MessageSendingException(packet->getMessage()->getType(), "not connected");
         if (!m_msgFactory->isMessageRegistered(packet->getMessage()->getType()))
             throw MessageSendingException(packet->getMessage()->getType(), "message type has not been registered with the MessageFactory");
 
         m_bus->sendMessage(this, packet);
-        return true;
     }
 
     /**

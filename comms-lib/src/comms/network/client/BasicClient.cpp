@@ -1,5 +1,6 @@
-#include "comms/network/client/BasicClient.h"
 #include <functional>
+
+#include "comms/network/client/BasicClient.h"
 
 namespace cadf::comms {
     /*
@@ -67,7 +68,7 @@ namespace cadf::comms {
     /*
      * Send a message to the server
      */
-    bool BasicClient::send(OutputBuffer *out) {
-        return m_socket->send(out);
+    void BasicClient::send(OutputBuffer *out) {
+        m_socket->send(out);
     }
 }

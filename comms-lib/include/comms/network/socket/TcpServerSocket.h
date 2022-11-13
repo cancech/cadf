@@ -32,11 +32,10 @@ namespace cadf::comms {
 
             /**
              * A server socket is not intended to send/receive messages, as such this will do nothing.
-             *
-             * @param *out const OutputBuffer is unused
-             * @return bool false
+             * 
+             * A cadf::comms::SocketException will be thrown if an attempt to send is made
              */
-            bool send(const OutputBuffer *out);
+            void send(const OutputBuffer *out);
 
             /**
              * Does nothing, the listener is ignored.

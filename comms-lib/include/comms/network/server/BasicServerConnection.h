@@ -2,6 +2,8 @@
 #define CAMB_NETWORK_SERVER_BASICSERVERCONNECTION_H_
 
 #include "comms/network/server/ServerConnectionFactory.h"
+#include "comms/network/socket/SocketException.h"
+#include "comms/connection/ConnectionException.h"
 
 namespace cadf::comms {
 
@@ -109,14 +111,18 @@ namespace cadf::comms {
              * delete(msg);
              *
              * @param *msg const Message pointer to the message that is to be sent
-             * @param recipientType int the type of recipient that is to receive the message
-             * @param recipientInstance int the instance of the type that is to receive the message
+             * @param recipientType int the type of recipient that is to receive the message (defaults to broadcast)
+             * @param recipientInstance int the instance of the type that is to receive the message (defaults to broadcast)
              *
              * @return bool true if the message was successfully sent
              */
-            virtual bool sendMessage(const IMessage *msg, int recipientType, int recipientInstance) {
+            virtual void sendMessage(const IMessage *msg, int recipientType = ConnectionConstants::BROADCAST, int recipientInstance = ConnectionConstants::BROADCAST) {
                 MessagePacket packet(msg, recipientType, recipientInstance);
-                return sendPacket(&packet);
+                try {
+                    sendPacket(&packet);
+                } catch(SocketException &e) {
+                    throw MessageSendingException(packet.getMessage()->getType(), e.what());
+                }
             }
 
             /**
@@ -129,11 +135,11 @@ namespace cadf::comms {
              *
              * @param *packet const MessagePacket pointer to the packet that is to be sent
              *
-             * @return bool true if the packet was successfully sent
+             * A cadf::comms::SocketException will be thrown if an issue is encountered attempting to send the message.
              */
-            virtual bool sendPacket(const MessagePacket *packet) {
+            virtual void sendPacket(const MessagePacket *packet) {
                 std::unique_ptr<OutputBuffer> out(m_protocolFactory->serializeMessage(*packet));
-                return m_socket->send(out.get());
+                m_socket->send(out.get());
             }
 
             /**

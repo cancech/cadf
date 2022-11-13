@@ -1,4 +1,5 @@
 #include "comms/network/socket/TcpClientSocket.h"
+#include "comms/network/socket/SocketException.h"
 
 namespace cadf::comms {
 
@@ -43,11 +44,11 @@ namespace cadf::comms {
     /*
      * Send a message
      */
-    bool TcpClientSocket::send(const OutputBuffer *out) {
-        if (!isConnected() || out->getDataSize() > m_maxMessageSize)
-            return false;
+    void TcpClientSocket::send(const OutputBuffer *out) {
+        if (!isConnected())
+            throw SocketException("not connected");
 
-        return m_dataSocket->send(out);
+        m_dataSocket->send(out);
     }
 
     /*

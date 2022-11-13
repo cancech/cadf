@@ -1,4 +1,5 @@
-#include <comms/node/Node.h>
+#include "comms/node/Node.h"
+#include "comms/connection/ConnectionException.h"
 
 namespace cadf::comms {
 
@@ -65,11 +66,11 @@ namespace cadf::comms {
     /**
      * Send a message
      */
-    bool Node::sendMessage(IMessage *msg, int recipientType, int recipientInstance) {
+    void Node::sendMessage(IMessage *msg, int recipientType, int recipientInstance) {
         if (!isConnected())
-            return false;
+            throw MessageSendingException(msg->getType(), "not connected");
 
-        return m_connection->sendMessage(msg, recipientType, recipientInstance);
+        m_connection->sendMessage(msg, recipientType, recipientInstance);
     }
 
     /**

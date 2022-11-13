@@ -3,10 +3,12 @@
 
 #include "comms/Constants.h"
 #include "comms/connection/Connection.h"
+#include "comms/connection/ConnectionException.h"
 
 #include "comms/network/client/Client.h"
 #include "comms/network/Buffer.h"
 #include "comms/network/socket/ISocketMessageReceivedListener.h"
+#include "comms/network/socket/SocketException.h"
 #include "comms/network/handshake/HandshakeInitMessage.h"
 #include "comms/network/handshake/HandshakeResponseMessage.h"
 #include "comms/network/handshake/HandshakeCompleteMessage.h"
@@ -68,28 +70,34 @@ namespace cadf::comms {
              * @param *msg const IMessage to send
              * @param recipientType int indication which type of recipient should receive the message (defaults to BROADCAST)
              * @param recipientInstance int indication which instance of recipient should receive the message (defaults to BROADCAST)
-             * @return bool true if the message was successfully sent
+             *
+             * A cadf::comms::MessageSendingException will be thrown if an issue is encountered attempting to send the message.
              */
-            virtual bool sendMessage(const IMessage *msg, int recipientType = ConnectionConstants::BROADCAST, int recipientInstance = ConnectionConstants::BROADCAST) {
+            virtual void sendMessage(const IMessage *msg, int recipientType = ConnectionConstants::BROADCAST, int recipientInstance = ConnectionConstants::BROADCAST) {
                 if (!isConnected())
-                    return false;
+                    throw MessageSendingException(msg->getType(), "not connected");
 
                 MessagePacket packet(msg, recipientType, recipientInstance);
-                return sendPacket(&packet);
+                sendPacket(&packet);
             }
 
             /**
              * Attempts to send the specified package to the bus for distribution.
              *
              * @param *packet const MessagePacket to send
-             * @return bool true if the message was successfully sent
+             *
+             * A cadf::comms::MessageSendingException will be thrown if an issue is encountered attempting to send the message.
              */
-            virtual bool sendPacket(const MessagePacket *packet) {
+            virtual void sendPacket(const MessagePacket *packet) {
                 if (!isConnected())
-                    return false;
+                    throw MessageSendingException(packet->getMessage()->getType(), "not connected");
 
                 std::unique_ptr<OutputBuffer> out(m_msgFactory->serializeMessage(*packet));
-                return m_client->send(out.get());
+                try {
+                    m_client->send(out.get());
+                } catch(SocketException &e) {
+                    throw MessageSendingException(packet->getMessage()->getType(), e.what());
+                }
             }
 
             /**
@@ -104,7 +112,9 @@ namespace cadf::comms {
                 if (packet->getMessage()->getType() == "HandshakeInitMessage") {
                     HandshakeResponseDataV1 responseData = { getType(), getInstance() };
                     HandshakeResponseMessageV1 response(responseData);
-                    if (!sendMessage(&response)) {
+                    try {
+                        sendMessage(&response);
+                    } catch (cadf::comms::MessageSendingException &e) {
                         // TODO should report failure to send the message in some manner
                     }
                 } else {

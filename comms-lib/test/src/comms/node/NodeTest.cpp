@@ -4,7 +4,8 @@
 #endif
 #include <boost/test/unit_test.hpp>
 
-#include <comms/node/Node.h>
+#include "comms/node/Node.h"
+#include "comms/connection/ConnectionException.h"
 
 #include <fakeit.hpp>
 
@@ -37,7 +38,7 @@ namespace NodeTest {
                 fakeit::When(Method(mockConnection, connect)).AlwaysReturn(true);
                 fakeit::When(Method(mockConnection, disconnect)).AlwaysReturn(true);
                 fakeit::When(Method(mockConnection, isConnected)).AlwaysReturn(false);
-                fakeit::When(Method(mockConnection, sendMessage)).AlwaysReturn(true);
+                fakeit::Fake(Method(mockConnection, sendMessage));
 
                 fakeit::When(Method(mockSomeProcessor, getType)).AlwaysReturn("SomeMessage");
                 fakeit::When(Method(mockSomeProcessor, process)).AlwaysReturn();
@@ -187,7 +188,7 @@ BOOST_AUTO_TEST_SUITE(Node_Test_Suite)
         ConnectWhenDisconnectedTest::test_method();
 
         // Mocked connection returns true
-        BOOST_CHECK(node->sendMessage(&mockSomeMessage.get(), 1, 2));
+        BOOST_REQUIRE_NO_THROW(node->sendMessage(&mockSomeMessage.get(), 1, 2));
         fakeit::Verify(Method(mockConnection, isConnected)).Exactly(++timesIsConnected);
         fakeit::Verify(Method(mockConnection, sendMessage).Using(&mockSomeMessage.get(), 1, 2)).Once();
         verifyAllMocksChecked();
@@ -197,8 +198,9 @@ BOOST_AUTO_TEST_SUITE(Node_Test_Suite)
      * Verify that the node cannot send a message when disconnected
      */
     BOOST_FIXTURE_TEST_CASE(SendMessageWhenDisconnectedTest, NodeTest::TestFixture) {
-        BOOST_CHECK_EQUAL(false, node->sendMessage(&mockOtherMessage.get(), 2, 1));
+        BOOST_REQUIRE_THROW(node->sendMessage(&mockOtherMessage.get(), 2, 1), cadf::comms::MessageSendingException);
         fakeit::Verify(Method(mockConnection, isConnected)).Exactly(++timesIsConnected);
+        fakeit::Verify(Method(mockOtherMessage, getType)).Once();
         verifyAllMocksChecked();
     }
 

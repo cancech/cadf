@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "comms/Constants.h"
 #include "comms/message/MessageFactory.h"
 #include "comms/message/MessageRegistry.h"
 
@@ -84,12 +85,12 @@ namespace cadf::comms {
              * delete(msg);
              *
              * @param *msg const Message pointer to the message that is to be sent
-             * @param recipientType int the type of recipient that is to receive the message
-             * @param recipientInstance int the instance of the type that is to receive the message
+             * @param recipientType int the type of recipient that is to receive the message (defaults to broadcast)
+             * @param recipientInstance int the instance of the type that is to receive the message (defaults to broadcast)
              *
-             * @return bool true if the message was successfully sent
+             * A cadf::comms::MessageSendingException will be thrown if an issue is encountered attempting to send the message.
              */
-            virtual bool sendMessage(const IMessage *msg, int recipientType, int recipientInstance) = 0;
+            virtual void sendMessage(const IMessage *msg, int recipientType = ConnectionConstants::BROADCAST, int recipientInstance = ConnectionConstants::BROADCAST) = 0;
 
             /**
              * Sends an addressed packet on the connection. Note that no form of memory management is performed, and the sender is fully
@@ -101,9 +102,9 @@ namespace cadf::comms {
              *
              * @param *packet const MessagePacket pointer to the packet that is to be sent
              *
-             * @return bool true if the packet was successfully sent
+             * A cadf::comms::MessageSendingException will be thrown if an issue is encountered attempting to send the message.
              */
-            virtual bool sendPacket(const MessagePacket *packet) = 0;
+            virtual void sendPacket(const MessagePacket *packet) = 0;
 
             /**
              * Add a listener to be notified when a message is received.

@@ -30,9 +30,10 @@ namespace cadf::comms {
              * Send the data in the message
              *
              * @param *out const OutputBuffer with the message to send
-             * @return bool true if the message was successfully sent
+             *
+             * A cadf::comms::SocketException will be thrown if an issue is encountered attempting to send the message.
              */
-            virtual bool send(const OutputBuffer *out);
+            virtual void send(const OutputBuffer *out);
 
             /**
              * Add a listener that is to be triggered when a message is received by the socket.

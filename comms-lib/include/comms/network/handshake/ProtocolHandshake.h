@@ -2,6 +2,7 @@
 #define CAMB_NETWORK_HANDSHAKE_PROTOCOLHANDSHAKE_H_
 
 #include "comms/network/socket/TcpSocketDataHandler.h"
+#include "comms/network/socket/SocketException.h"
 #include "comms/network/handshake/Handshake.h"
 #include "comms/network/handshake/HandshakeHandler.h"
 #include "comms/Constants.h"
@@ -80,7 +81,9 @@ namespace cadf::comms {
             void send(IMessage *msg) {
                 MessagePacket packet(msg, ConnectionConstants::BROADCAST, ConnectionConstants::BROADCAST);
                 std::unique_ptr<OutputBuffer> out(m_msgFactory->serializeMessage(packet));
-                if (!m_socket->send(out.get())) {
+                try {
+                    m_socket->send(out.get());
+                } catch(SocketException &e) {
                     // TODO
                 }
             }

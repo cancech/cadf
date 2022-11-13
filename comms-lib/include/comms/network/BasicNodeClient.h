@@ -83,10 +83,10 @@ namespace cadf::comms {
              * @param type int of the recipient
              * @param instance int of the recipient
              *
-             * @return bool true if the message was sent successfully
+             * A cadf::comms::MessageSendingException will be thrown if an issue is encountered attempting to send the message.
              */
-            virtual bool sendMessage(cadf::comms::IMessage *msg, int type, int instance) {
-                return m_clientNode.sendMessage(msg, type, instance);
+            virtual void sendMessage(cadf::comms::IMessage *msg, int type, int instance) {
+                m_clientNode.sendMessage(msg, type, instance);
             }
 
         protected:

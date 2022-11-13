@@ -153,9 +153,10 @@ BOOST_AUTO_TEST_SUITE(LocalConnection_Test_Suite)
         registerBus();
 
         BOOST_CHECK_EQUAL(false, conn.isConnected());
-        BOOST_CHECK_EQUAL(false, conn.sendMessage(&mockMessage.get()));
-        BOOST_CHECK_EQUAL(false, conn.sendMessage(&mockMessage.get()));
-        BOOST_CHECK_EQUAL(false, conn.sendMessage(&mockMessage.get()));
+        BOOST_REQUIRE_THROW(conn.sendMessage(&mockMessage.get()), cadf::comms::MessageSendingException);
+        BOOST_REQUIRE_THROW(conn.sendMessage(&mockMessage.get()), cadf::comms::MessageSendingException);
+        BOOST_REQUIRE_THROW(conn.sendMessage(&mockMessage.get()), cadf::comms::MessageSendingException);
+        fakeit::Verify(Method(mockMessage, getType)).Exactly(3);
         verifyAllMocksChecked();
     }
 
@@ -190,7 +191,7 @@ BOOST_AUTO_TEST_SUITE(LocalConnection_Test_Suite)
             BOOST_CHECK_EQUAL(&conn, passedConn);
             BOOST_CHECK_EQUAL(&mockMessage.get(), packet->getMessage());
         });
-        BOOST_CHECK(conn.sendMessage(&mockMessage.get()));
+        BOOST_REQUIRE_NO_THROW(conn.sendMessage(&mockMessage.get()));
         fakeit::Verify(Method(mockMessage, getType)).Once();
         fakeit::Verify(Method(mockFactory, isMessageRegistered).Using("MessageType")).Once();
         fakeit::Verify(Method(mockBus, sendMessage)).Once();

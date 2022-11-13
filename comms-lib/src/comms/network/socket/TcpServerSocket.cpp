@@ -1,4 +1,5 @@
 #include "comms/network/socket/TcpServerSocket.h"
+#include "comms/network/socket/SocketException.h"
 
 #include <functional>
 #include <unistd.h>
@@ -47,8 +48,8 @@ namespace cadf::comms {
     /*
      * Cannot send
      */
-    bool TcpServerSocket::send(const OutputBuffer *out) {
-        return false;
+    void TcpServerSocket::send(const OutputBuffer *out) {
+        throw SocketException("server socket cannot send messages");
     }
 
     /*

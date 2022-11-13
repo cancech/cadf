@@ -6,6 +6,7 @@
 #include <fakeit.hpp>
 
 #include "comms/network/client/BasicClient.h"
+#include "comms/connection/ConnectionException.h"
 
 namespace BasicClientTest {
 
@@ -273,12 +274,12 @@ BOOST_AUTO_TEST_SUITE(BasicClient_Test_Suite)
      * Verify that attempting to send a message works as expected
      */
     BOOST_FIXTURE_TEST_CASE(SendMessageTest, BasicClientTest::TestFixture) {
-        fakeit::When(Method(mockSocket, send)).AlwaysReturn(true);
-        BOOST_CHECK(client->send(&mockOutBuffer.get()));
+        fakeit::Fake(Method(mockSocket, send));
+        BOOST_REQUIRE_NO_THROW(client->send(&mockOutBuffer.get()));
         fakeit::Verify(Method(mockSocket, send).Using(&mockOutBuffer.get())).Exactly(1);
 
-        fakeit::When(Method(mockSocket, send)).AlwaysReturn(false);
-        BOOST_CHECK(!client->send(&mockOutBuffer.get()));
+        fakeit::When(Method(mockSocket, send)).AlwaysThrow(cadf::comms::MessageSendingException("", ""));
+        BOOST_REQUIRE_THROW(client->send(&mockOutBuffer.get()), cadf::comms::MessageSendingException);
         fakeit::Verify(Method(mockSocket, send).Using(&mockOutBuffer.get())).Exactly(2);
     }
 

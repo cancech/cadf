@@ -56,8 +56,10 @@ namespace cadf::comms {
              * Send a message to the server.
              *
              * @param *out OutputBuffer containing the serialized message to send
+             *
+             * A cadf::comms::SocketException will be thrown if an issue is encountered attempting to send the message.
              */
-            virtual bool send(OutputBuffer *out);
+            virtual void send(OutputBuffer *out);
 
         private:
             /** The connection socket */

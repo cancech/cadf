@@ -207,16 +207,16 @@ BOOST_AUTO_TEST_SUITE(ThreadedLocalNodeIT_Test_Suite)
      */
     BOOST_FIXTURE_TEST_CASE(SendMessagesNotRegisteredWithFactoryDisconnectedTest, BasicThreadedLocalNodeITTest::TestFixture) {
         // Registered messages
-        BOOST_CHECK(!node1_1->sendMessage(&tm1_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
-        BOOST_CHECK(!node1_1->sendMessage(&tm2_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
-        BOOST_CHECK(!node1_2->sendMessage(&tm1_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
-        BOOST_CHECK(!node1_2->sendMessage(&tm2_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_THROW(node1_1->sendMessage(&tm1_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST), cadf::comms::MessageSendingException);
+        BOOST_REQUIRE_THROW(node1_1->sendMessage(&tm2_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST), cadf::comms::MessageSendingException);
+        BOOST_REQUIRE_THROW(node1_1->sendMessage(&tm1_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST), cadf::comms::MessageSendingException);
+        BOOST_REQUIRE_THROW(node1_1->sendMessage(&tm2_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST), cadf::comms::MessageSendingException);
 
         // Unregistered messages
-        BOOST_CHECK(!node1_1->sendMessage(&tm3_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
-        BOOST_CHECK(!node1_1->sendMessage(&tm3_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
-        BOOST_CHECK(!node1_2->sendMessage(&tm3_3, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
-        BOOST_CHECK(!node1_2->sendMessage(&tm3_4, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_THROW(node1_1->sendMessage(&tm3_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST), cadf::comms::MessageSendingException);
+        BOOST_REQUIRE_THROW(node1_1->sendMessage(&tm3_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST), cadf::comms::MessageSendingException);
+        BOOST_REQUIRE_THROW(node1_1->sendMessage(&tm3_3, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST), cadf::comms::MessageSendingException);
+        BOOST_REQUIRE_THROW(node1_1->sendMessage(&tm3_4, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST), cadf::comms::MessageSendingException);
     }
 
     /**
@@ -226,11 +226,11 @@ BOOST_AUTO_TEST_SUITE(ThreadedLocalNodeIT_Test_Suite)
         connectNodes();
 
         // Try sending from node 1 to node 2
-        BOOST_CHECK(node1_1->sendMessage(&tm1_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
-        BOOST_CHECK(node1_1->sendMessage(&tm2_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm1_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm2_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         // Try sending from node 2 to node 1
-        BOOST_CHECK(node1_2->sendMessage(&tm1_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
-        BOOST_CHECK(node1_2->sendMessage(&tm2_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_2->sendMessage(&tm1_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_2->sendMessage(&tm2_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
 
         // Noone received anything
         verifyMessagesReceived(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -250,11 +250,11 @@ BOOST_AUTO_TEST_SUITE(ThreadedLocalNodeIT_Test_Suite)
         connectNodes();
 
         // Try sending from node 1 to node 2
-        BOOST_CHECK(node1_1->sendMessage(&tm1_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
-        BOOST_CHECK(node1_1->sendMessage(&tm2_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm1_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm2_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         // Try sending from node 2 to node 1
-        BOOST_CHECK(node1_2->sendMessage(&tm1_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
-        BOOST_CHECK(node1_2->sendMessage(&tm2_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_2->sendMessage(&tm1_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_2->sendMessage(&tm2_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
 
         // Verify that only tm1_1 made it through
         verifyMessagesReceived(NULL, NULL, &tm1_1, NULL, NULL, NULL, NULL, NULL);
@@ -263,11 +263,11 @@ BOOST_AUTO_TEST_SUITE(ThreadedLocalNodeIT_Test_Suite)
         node1_1->addProcessor(&node1_1TestMessage2Processor);
 
         // Try sending from node 1 to node 2
-        BOOST_CHECK(node1_1->sendMessage(&tm1_3, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
-        BOOST_CHECK(node1_1->sendMessage(&tm2_3, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm1_3, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm2_3, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         // Try sending from node 2 to node 1
-        BOOST_CHECK(node1_2->sendMessage(&tm1_4, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
-        BOOST_CHECK(node1_2->sendMessage(&tm2_4, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_2->sendMessage(&tm1_4, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_2->sendMessage(&tm2_4, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
 
         // Verify that only tm1_1 and tm2_4 made it through
         verifyMessagesReceived(NULL, &tm2_4, &tm1_3, NULL, NULL, NULL, NULL, NULL);
@@ -290,15 +290,15 @@ BOOST_AUTO_TEST_SUITE(ThreadedLocalNodeIT_Test_Suite)
         node2_2->addProcessor(&node2_2TestMessage2Processor);
 
         // Sending messages from node1_1
-        BOOST_CHECK(node1_1->sendMessage(&tm1_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm1_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, &tm1_1, NULL, &tm1_1, NULL, &tm1_1, NULL);
-        BOOST_CHECK(node1_1->sendMessage(&tm2_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm2_1, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, NULL, &tm2_1, NULL, &tm2_1, NULL, &tm2_1);
 
         // Sending messages from node1_2
-        BOOST_CHECK(node1_2->sendMessage(&tm1_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_2->sendMessage(&tm1_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(&tm1_2, NULL, NULL, NULL, &tm1_2, NULL, &tm1_2, NULL);
-        BOOST_CHECK(node1_2->sendMessage(&tm2_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_2->sendMessage(&tm2_2, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, &tm2_2, NULL, NULL, NULL, &tm2_2, NULL, &tm2_2);
     }
 
@@ -340,9 +340,9 @@ BOOST_AUTO_TEST_SUITE(ThreadedLocalNodeIT_Test_Suite)
         node1_2->removeProcessor(&node1_2TestMessageProcessor);
 
         // Sending messages from node1_1
-        BOOST_CHECK(node1_1->sendMessage(&tm1_3, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm1_3, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, NULL, NULL, &tm1_3, NULL, &tm1_3, NULL);
-        BOOST_CHECK(node1_1->sendMessage(&tm2_3, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm2_3, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, NULL, &tm2_3, NULL, &tm2_3, NULL, &tm2_3);
 
         // *****************************
@@ -350,9 +350,9 @@ BOOST_AUTO_TEST_SUITE(ThreadedLocalNodeIT_Test_Suite)
         // *****************************
         node2_1->removeProcessor(&node2_1TestMessage2Processor);
         // Sending messages from node1_1
-        BOOST_CHECK(node1_1->sendMessage(&tm1_4, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm1_4, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, NULL, NULL, &tm1_4, NULL, &tm1_4, NULL);
-        BOOST_CHECK(node1_1->sendMessage(&tm2_4, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm2_4, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, NULL, &tm2_4, NULL, NULL, NULL, &tm2_4);
 
         // *****************************
@@ -366,21 +366,21 @@ BOOST_AUTO_TEST_SUITE(ThreadedLocalNodeIT_Test_Suite)
         node2_2->removeProcessor(&node2_2TestMessage2Processor);
 
         // Send a message from each node
-        BOOST_CHECK(node1_1->sendMessage(&tm1_5, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm1_5, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-        BOOST_CHECK(node1_1->sendMessage(&tm2_5, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm2_5, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-        BOOST_CHECK(node1_2->sendMessage(&tm1_6, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_2->sendMessage(&tm1_6, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-        BOOST_CHECK(node1_2->sendMessage(&tm2_6, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_2->sendMessage(&tm2_6, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-        BOOST_CHECK(node2_1->sendMessage(&tm1_7, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node2_1->sendMessage(&tm1_7, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-        BOOST_CHECK(node2_1->sendMessage(&tm2_7, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node2_1->sendMessage(&tm2_7, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-        BOOST_CHECK(node2_2->sendMessage(&tm1_8, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node2_2->sendMessage(&tm1_8, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-        BOOST_CHECK(node2_2->sendMessage(&tm2_8, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node2_2->sendMessage(&tm2_8, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     }
 
@@ -398,21 +398,21 @@ BOOST_AUTO_TEST_SUITE(ThreadedLocalNodeIT_Test_Suite)
         node1_2->removeProcessor(&unusedTestMessage2Processor2);
 
         // Messages can still be sent as per normal
-        BOOST_CHECK(node1_1->sendMessage(&tm1_3, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm1_3, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, &tm1_3, NULL, &tm1_3, NULL, &tm1_3, NULL);
-        BOOST_CHECK(node1_1->sendMessage(&tm2_3, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm2_3, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, NULL, &tm2_3, NULL, &tm2_3, NULL, &tm2_3);
-        BOOST_CHECK(node1_2->sendMessage(&tm1_4, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_2->sendMessage(&tm1_4, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(&tm1_4, NULL, NULL, NULL, &tm1_4, NULL, &tm1_4, NULL);
-        BOOST_CHECK(node1_2->sendMessage(&tm2_4, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_2->sendMessage(&tm2_4, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, &tm2_4, NULL, NULL, NULL, &tm2_4, NULL, &tm2_4);
-        BOOST_CHECK(node2_1->sendMessage(&tm1_5, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node2_1->sendMessage(&tm1_5, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(&tm1_5, NULL, &tm1_5, NULL, NULL, NULL, &tm1_5, NULL);
-        BOOST_CHECK(node2_1->sendMessage(&tm2_5, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node2_1->sendMessage(&tm2_5, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, &tm2_5, NULL, &tm2_5, NULL, NULL, NULL, &tm2_5);
-        BOOST_CHECK(node2_2->sendMessage(&tm1_6, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node2_2->sendMessage(&tm1_6, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(&tm1_6, NULL, &tm1_6, NULL, &tm1_6, NULL, NULL, NULL);
-        BOOST_CHECK(node2_2->sendMessage(&tm2_6, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node2_2->sendMessage(&tm2_6, cadf::comms::ConnectionConstants::BROADCAST, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, &tm2_6, NULL, &tm2_6, NULL, &tm2_6, NULL, NULL);
     }
 
@@ -424,15 +424,15 @@ BOOST_AUTO_TEST_SUITE(ThreadedLocalNodeIT_Test_Suite)
         SendMessagesManyProcessorsAddedBroadcastToAllTest::test_method();
 
         // Cannot send to self
-        BOOST_CHECK(node1_1->sendMessage(&tm1_3, 1, 1));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm1_3, 1, 1));
         verifyMessagesReceived(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-        BOOST_CHECK(node1_1->sendMessage(&tm2_3, 1, 1));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm2_3, 1, 1));
         verifyMessagesReceived(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
         // Can send to another
-        BOOST_CHECK(node2_2->sendMessage(&tm1_4, 1, 2));
+        BOOST_REQUIRE_NO_THROW(node2_2->sendMessage(&tm1_4, 1, 2));
         verifyMessagesReceived(NULL, NULL, &tm1_4, NULL, NULL, NULL, NULL, NULL);
-        BOOST_CHECK(node2_1->sendMessage(&tm2_4, 1, 2));
+        BOOST_REQUIRE_NO_THROW(node2_1->sendMessage(&tm2_4, 1, 2));
         verifyMessagesReceived(NULL, NULL, NULL, &tm2_4, NULL, NULL, NULL, NULL);
     }
 
@@ -444,15 +444,15 @@ BOOST_AUTO_TEST_SUITE(ThreadedLocalNodeIT_Test_Suite)
         SendMessagesManyProcessorsAddedBroadcastToAllTest::test_method();
 
         // Broadcasting to self will not deliver to the sending node
-        BOOST_CHECK(node1_1->sendMessage(&tm1_3, 1, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm1_3, 1, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, &tm1_3, NULL, NULL, NULL, NULL, NULL);
-        BOOST_CHECK(node1_1->sendMessage(&tm2_3, 1, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm2_3, 1, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, NULL, NULL, &tm2_3, NULL, NULL, NULL, NULL);
 
         // Can send to another
-        BOOST_CHECK(node2_2->sendMessage(&tm1_4, 1, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node2_2->sendMessage(&tm1_4, 1, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(&tm1_4, NULL, &tm1_4, NULL, NULL, NULL, NULL, NULL);
-        BOOST_CHECK(node2_1->sendMessage(&tm2_4, 1, cadf::comms::ConnectionConstants::BROADCAST));
+        BOOST_REQUIRE_NO_THROW(node2_1->sendMessage(&tm2_4, 1, cadf::comms::ConnectionConstants::BROADCAST));
         verifyMessagesReceived(NULL, &tm2_4, NULL, &tm2_4, NULL, NULL, NULL, NULL);
     }
 
@@ -464,15 +464,15 @@ BOOST_AUTO_TEST_SUITE(ThreadedLocalNodeIT_Test_Suite)
         SendMessagesManyProcessorsAddedBroadcastToAllTest::test_method();
 
         // Can send to self
-        BOOST_CHECK(node1_1->sendMessage(&tm1_3, cadf::comms::ConnectionConstants::BROADCAST, 1));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm1_3, cadf::comms::ConnectionConstants::BROADCAST, 1));
         verifyMessagesReceived(NULL, NULL, NULL, NULL, &tm1_3, NULL, NULL, NULL);
-        BOOST_CHECK(node1_1->sendMessage(&tm2_3, cadf::comms::ConnectionConstants::BROADCAST, 1));
+        BOOST_REQUIRE_NO_THROW(node1_1->sendMessage(&tm2_3, cadf::comms::ConnectionConstants::BROADCAST, 1));
         verifyMessagesReceived(NULL, NULL, NULL, NULL, NULL, &tm2_3, NULL, NULL);
 
         // Can send to another
-        BOOST_CHECK(node2_2->sendMessage(&tm1_4, cadf::comms::ConnectionConstants::BROADCAST, 1));
+        BOOST_REQUIRE_NO_THROW(node2_2->sendMessage(&tm1_4, cadf::comms::ConnectionConstants::BROADCAST, 1));
         verifyMessagesReceived(&tm1_4, NULL, NULL, NULL, &tm1_4, NULL, NULL, NULL);
-        BOOST_CHECK(node2_1->sendMessage(&tm2_4, cadf::comms::ConnectionConstants::BROADCAST, 2));
+        BOOST_REQUIRE_NO_THROW(node2_1->sendMessage(&tm2_4, cadf::comms::ConnectionConstants::BROADCAST, 2));
         verifyMessagesReceived(NULL, NULL, NULL, &tm2_4, NULL, NULL, NULL, &tm2_4);
     }
 

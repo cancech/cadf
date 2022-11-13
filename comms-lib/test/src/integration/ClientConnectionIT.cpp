@@ -74,7 +74,7 @@ namespace ClientConnectionIT {
         // Send a test message from Client1 to Client2
         TestData data1 = {1, 1.23};
         TestMessage1 msg1(data1);
-        BOOST_CHECK(client1.sendMessage(&msg1, 2, 1));
+        BOOST_REQUIRE_NO_THROW(client1.sendMessage(&msg1, 2, 1));
         giveThreadSomeTime();
 
         client1Processor.verifyState(0, -1, -2);
@@ -84,7 +84,7 @@ namespace ClientConnectionIT {
         // Send a test message from Client2 to Client1
         TestData data2 = {234, 4.56};
         TestMessage1 msg2(data2);
-        BOOST_CHECK(client2.sendMessage(&msg2, 1, 1));
+        BOOST_REQUIRE_NO_THROW(client2.sendMessage(&msg2, 1, 1));
         giveThreadSomeTime();
 
         client1Processor.verifyState(1, 234, 4.56);
@@ -98,8 +98,8 @@ namespace ClientConnectionIT {
         BOOST_CHECK(!client2.isConnected());
 
         // Verify that can no longer send messages
-        BOOST_CHECK(!client1.sendMessage(&msg1, 2, 1));
-        BOOST_CHECK(!client2.sendMessage(&msg2, 1, 1));
+        BOOST_REQUIRE_THROW(client1.sendMessage(&msg1, 2, 1), cadf::comms::MessageSendingException);
+        BOOST_REQUIRE_THROW(client2.sendMessage(&msg2, 1, 1), cadf::comms::MessageSendingException);
 
         // Terminate the server
         BOOST_CHECK(server.isUp());

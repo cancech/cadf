@@ -1,4 +1,5 @@
 #include "comms/network/socket/TcpSocketDataHandler.h"
+#include "comms/network/socket/SocketException.h"
 
 #include <functional>
 #include <algorithm>
@@ -73,10 +74,11 @@ namespace cadf::comms {
     /*
      * Send the message
      */
-    bool TcpSocketDataHandler::send(const OutputBuffer *out) {
+    void TcpSocketDataHandler::send(const OutputBuffer *out) {
         if (out->getDataSize() > m_maxMessageSize)
-            return false;
+            throw SocketException("buffer overflow - data to send is larger than the maximum allowed message size");
 
-        return ::send(m_socketFd, out->getData(), out->getDataSize(), 0) == (int) out->getDataSize();
+        if(::send(m_socketFd, out->getData(), out->getDataSize(), 0) != out->getDataSize())
+            throw SocketException("error sending message");
     }
 }

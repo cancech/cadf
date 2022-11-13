@@ -5,6 +5,8 @@
 #include <boost/test/unit_test.hpp>
 #include <fakeit.hpp>
 
+#include "comms/connection/ConnectionException.h"
+#include "comms/network/socket/SocketException.h"
 #include "comms/network/server/BasicServerConnection.h"
 #include "comms/network/serializer/local/Serializer.h"
 
@@ -20,6 +22,7 @@ namespace BasicServerConnectionTest {
                 fakeit::Fake(Method(mockSocket, removeListener));
                 fakeit::Fake(Method(mockListener, messageReceived));
                 fakeit::When(Method(mockFactory, deserializeMessage)).AlwaysReturn(new cadf::comms::MessagePacket(&mockReceivedMessage.get(), 1, 2));
+                fakeit::When(Method(mockSentMessage, getType)).AlwaysReturn("MockMessage");
             }
 
             ~SetupMocks() {
@@ -82,7 +85,7 @@ BOOST_AUTO_TEST_SUITE(BasicServerConnection_Test_Suite)
      */
     BOOST_FIXTURE_TEST_CASE(VerifySendMessageSuccessfulTest, BasicServerConnectionTest::TestFixture) {
         cadf::comms::OutputBuffer *out = new cadf::comms::OutputBuffer(1);
-        fakeit::When(Method(mockSocket, send)).AlwaysReturn(true);
+        fakeit::Fake(Method(mockSocket, send));
         fakeit::When(Method(mockFactory, serializeMessage)).AlwaysDo([&](const cadf::comms::MessagePacket &packet) {
             BOOST_CHECK_EQUAL(123, packet.getRecipientType());
             BOOST_CHECK_EQUAL(321, packet.getRecipientInstance());
@@ -90,7 +93,7 @@ BOOST_AUTO_TEST_SUITE(BasicServerConnection_Test_Suite)
             return out;
         });
 
-        BOOST_CHECK(conn->sendMessage(&mockSentMessage.get(), 123, 321));
+        BOOST_REQUIRE_NO_THROW(conn->sendMessage(&mockSentMessage.get(), 123, 321));
         fakeit::Verify(Method(mockFactory, serializeMessage)).Once();
         fakeit::Verify(Method(mockSocket, send).Using(out)).Once();
     }
@@ -100,7 +103,7 @@ BOOST_AUTO_TEST_SUITE(BasicServerConnection_Test_Suite)
      */
     BOOST_FIXTURE_TEST_CASE(VerifySendMessageUnsuccessfulTest, BasicServerConnectionTest::TestFixture) {
         cadf::comms::OutputBuffer *out = new cadf::comms::OutputBuffer(1);
-        fakeit::When(Method(mockSocket, send)).AlwaysReturn(false);
+        fakeit::When(Method(mockSocket, send)).AlwaysThrow(cadf::comms::SocketException(""));
         fakeit::When(Method(mockFactory, serializeMessage)).AlwaysDo([&](const cadf::comms::MessagePacket &packet) {
             BOOST_CHECK_EQUAL(59, packet.getRecipientType());
             BOOST_CHECK_EQUAL(251, packet.getRecipientInstance());
@@ -108,9 +111,10 @@ BOOST_AUTO_TEST_SUITE(BasicServerConnection_Test_Suite)
             return out;
         });
 
-        BOOST_CHECK(!conn->sendMessage(&mockSentMessage.get(), 59, 251));
+        BOOST_REQUIRE_THROW(conn->sendMessage(&mockSentMessage.get(), 59, 251), cadf::comms::MessageSendingException);
         fakeit::Verify(Method(mockFactory, serializeMessage)).Once();
         fakeit::Verify(Method(mockSocket, send).Using(out)).Once();
+        fakeit::Verify(Method(mockSentMessage, getType)).Once();
     }
 
     /**
@@ -118,7 +122,7 @@ BOOST_AUTO_TEST_SUITE(BasicServerConnection_Test_Suite)
      */
     BOOST_FIXTURE_TEST_CASE(VerifySendPacketSuccessfulTest, BasicServerConnectionTest::TestFixture) {
         cadf::comms::OutputBuffer *out = new cadf::comms::OutputBuffer(1);
-        fakeit::When(Method(mockSocket, send)).AlwaysReturn(true);
+        fakeit::Fake(Method(mockSocket, send));
         fakeit::When(Method(mockFactory, serializeMessage)).AlwaysDo([&](const cadf::comms::MessagePacket &packet) {
             BOOST_CHECK_EQUAL(123, packet.getRecipientType());
             BOOST_CHECK_EQUAL(321, packet.getRecipientInstance());
@@ -127,7 +131,7 @@ BOOST_AUTO_TEST_SUITE(BasicServerConnection_Test_Suite)
         });
 
         cadf::comms::MessagePacket toSend(&mockSentMessage.get(), 123, 321);
-        BOOST_CHECK(conn->sendPacket(&toSend));
+        BOOST_REQUIRE_NO_THROW(conn->sendPacket(&toSend));
         fakeit::Verify(Method(mockFactory, serializeMessage)).Once();
         fakeit::Verify(Method(mockSocket, send).Using(out)).Once();
     }
@@ -137,7 +141,7 @@ BOOST_AUTO_TEST_SUITE(BasicServerConnection_Test_Suite)
      */
     BOOST_FIXTURE_TEST_CASE(VerifySendPacketUnsuccessfulTest, BasicServerConnectionTest::TestFixture) {
         cadf::comms::OutputBuffer *out = new cadf::comms::OutputBuffer(1);
-        fakeit::When(Method(mockSocket, send)).AlwaysReturn(false);
+        fakeit::When(Method(mockSocket, send)).AlwaysThrow(cadf::comms::SocketException(""));
         fakeit::When(Method(mockFactory, serializeMessage)).AlwaysDo([&](const cadf::comms::MessagePacket &packet) {
             BOOST_CHECK_EQUAL(897, packet.getRecipientType());
             BOOST_CHECK_EQUAL(648, packet.getRecipientInstance());
@@ -146,7 +150,7 @@ BOOST_AUTO_TEST_SUITE(BasicServerConnection_Test_Suite)
         });
 
         cadf::comms::MessagePacket toSend(&mockSentMessage.get(), 897, 648);
-        BOOST_CHECK(!conn->sendPacket(&toSend));
+        BOOST_REQUIRE_THROW(conn->sendPacket(&toSend), cadf::comms::SocketException);
         fakeit::Verify(Method(mockFactory, serializeMessage)).Once();
         fakeit::Verify(Method(mockSocket, send).Using(out)).Once();
     }

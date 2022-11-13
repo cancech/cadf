@@ -40,12 +40,10 @@ namespace AbstractConnectionTest {
             virtual bool disconnect() {
                 return false;
             }
-            virtual bool sendMessage(const cadf::comms::IMessage *msg, int recipient, int instance) {
-                return false;
+            virtual void sendMessage(const cadf::comms::IMessage *msg, int recipient, int instance) {
             }
 
-            virtual bool sendPacket(const cadf::comms::MessagePacket *packet) {
-                return false;
+            virtual void sendPacket(const cadf::comms::MessagePacket *packet) {
             }
     };
 

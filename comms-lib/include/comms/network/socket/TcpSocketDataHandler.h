@@ -34,9 +34,10 @@ namespace cadf::comms {
              * Send a message contained with the buffer.
              *
              * @param *out const OutputBuffer containing the message to be sent
-             * @return bool true if the message was sent successfully
+             *
+             * A cadf::comms::SocketException will be thrown if an issue is encountered attempting to send the message.
              */
-            virtual bool send(const OutputBuffer *out) = 0;
+            virtual void send(const OutputBuffer *out) = 0;
     };
 
     /**
@@ -75,9 +76,10 @@ namespace cadf::comms {
              * Send a message contained with the buffer.
              *
              * @param *out const OutputBuffer containing the message to be sent
-             * @return bool true if the message was sent successfully
+             *
+             * A cadf::comms::MessageSendingException will be thrown if an issue is encountered attempting to send the message.
              */
-            virtual bool send(const OutputBuffer *out);
+            virtual void send(const OutputBuffer *out);
 
         private:
             /** Listeners to be notified when something is received */

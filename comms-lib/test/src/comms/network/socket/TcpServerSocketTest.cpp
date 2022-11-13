@@ -6,6 +6,7 @@
 #include <fakeit.hpp>
 
 #include "comms/network/socket/TcpServerSocket.h"
+#include "comms/network/socket/SocketException.h"
 
 namespace TcpServerSocketTest {
 
@@ -111,7 +112,7 @@ BOOST_AUTO_TEST_SUITE(TcpServerSocket_Test_Suite)
      * Verify that the methods that shouldn't do anything, don't do anything
      */
     BOOST_FIXTURE_TEST_CASE(UnsupportedMethodTest, TcpServerSocketTest::TestFixture) {
-        BOOST_CHECK(!m_socket->send(&mockOutputBuffer.get()));
+        BOOST_REQUIRE_THROW(m_socket->send(&mockOutputBuffer.get()), cadf::comms::SocketException);
         m_socket->removeMessageListener(&mockListener.get());
     }
 

@@ -19,7 +19,7 @@ namespace ProtocolHandshakeTest {
             SetupMocks() : m_sentMsgType("") {
                 fakeit::When(Method(mockSocket, addListener)).AlwaysReturn();
                 fakeit::When(Method(mockSocket, removeListener)).AlwaysReturn();
-                fakeit::When(Method(mockSocket, send)).AlwaysReturn(true);
+                fakeit::Fake(Method(mockSocket, send));
 
                 fakeit::When(Method(mockListener, handshakeComplete)).AlwaysReturn();
 
