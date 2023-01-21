@@ -6,7 +6,7 @@
 #include <boost/test/unit_test.hpp>
 #include <sstream>
 
-#include "comms/network/handshake/HandshakeResponseMessage.h"
+#include "comms/network/handshake/message/HandshakeResponseMessage.h"
 #include "comms/network/serializer/binary/Serializer.h"
 #include "comms/network/serializer/dom/JsonSerializer.h"
 

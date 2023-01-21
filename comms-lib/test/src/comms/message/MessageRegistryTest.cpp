@@ -56,14 +56,10 @@ BOOST_AUTO_TEST_SUITE(MessageRegistry_Test_Suite)
 BOOST_FIXTURE_TEST_CASE(RegisterNoMessage, MessageRegistryTest::SetupMocks) {
     cadf::comms::MessageRegistry<cadf::comms::local::LocalProtocol> registry;
     registry.registerMessages(&(mockFactory.get()));
-    fakeit::Verify(Method(mockFactory, registerMessage)).Exactly(3);
+    fakeit::Verify(Method(mockFactory, registerMessage)).Never();
 
-    BOOST_CHECK_EQUAL(3, messages.size());
-    BOOST_CHECK_EQUAL("HandshakeInitMessage", messages[0]->getType());
-    BOOST_CHECK_EQUAL("HandshakeResponseMessageV1", messages[1]->getType());
-    BOOST_CHECK_EQUAL("HandshakeCompleteMessage", messages[2]->getType());
-
-    BOOST_CHECK_EQUAL(3, factories.size());
+    BOOST_CHECK_EQUAL(0, messages.size());
+    BOOST_CHECK_EQUAL(0, factories.size());
 }
 
 /**
@@ -72,15 +68,11 @@ BOOST_FIXTURE_TEST_CASE(RegisterNoMessage, MessageRegistryTest::SetupMocks) {
 BOOST_FIXTURE_TEST_CASE(RegisterOneMessage, MessageRegistryTest::SetupMocks) {
     cadf::comms::MessageRegistry<cadf::comms::local::LocalProtocol, TestMessage1> registry;
     registry.registerMessages(&(mockFactory.get()));
-    fakeit::Verify(Method(mockFactory, registerMessage)).Exactly(4);
+    fakeit::Verify(Method(mockFactory, registerMessage)).Exactly(1);
 
-    BOOST_CHECK_EQUAL(4, messages.size());
+    BOOST_CHECK_EQUAL(1, messages.size());
     BOOST_CHECK_EQUAL("TestMessage1", messages[0]->getType());
-    BOOST_CHECK_EQUAL("HandshakeInitMessage", messages[1]->getType());
-    BOOST_CHECK_EQUAL("HandshakeResponseMessageV1", messages[2]->getType());
-    BOOST_CHECK_EQUAL("HandshakeCompleteMessage", messages[3]->getType());
-
-    BOOST_CHECK_EQUAL(4, factories.size());
+    BOOST_CHECK_EQUAL(1, factories.size());
 }
 
 /**
@@ -89,16 +81,12 @@ BOOST_FIXTURE_TEST_CASE(RegisterOneMessage, MessageRegistryTest::SetupMocks) {
 BOOST_FIXTURE_TEST_CASE(RegisterTwoMessages, MessageRegistryTest::SetupMocks) {
     cadf::comms::MessageRegistry<cadf::comms::local::LocalProtocol, TestMessage1, TestMessage2> registry;
     registry.registerMessages(&(mockFactory.get()));
-    fakeit::Verify(Method(mockFactory, registerMessage)).Exactly(5);
+    fakeit::Verify(Method(mockFactory, registerMessage)).Exactly(2);
 
-    BOOST_CHECK_EQUAL(5, messages.size());
+    BOOST_CHECK_EQUAL(2, messages.size());
     BOOST_CHECK_EQUAL("TestMessage1", messages[0]->getType());
     BOOST_CHECK_EQUAL("TestMessage2", messages[1]->getType());
-    BOOST_CHECK_EQUAL("HandshakeInitMessage", messages[2]->getType());
-    BOOST_CHECK_EQUAL("HandshakeResponseMessageV1", messages[3]->getType());
-    BOOST_CHECK_EQUAL("HandshakeCompleteMessage", messages[4]->getType());
-
-    BOOST_CHECK_EQUAL(5, factories.size());
+    BOOST_CHECK_EQUAL(2, factories.size());
 }
 
 /**
@@ -107,17 +95,13 @@ BOOST_FIXTURE_TEST_CASE(RegisterTwoMessages, MessageRegistryTest::SetupMocks) {
 BOOST_FIXTURE_TEST_CASE(RegisterThreeMessages, MessageRegistryTest::SetupMocks) {
     cadf::comms::MessageRegistry<cadf::comms::local::LocalProtocol, TestMessage1, TestMessage2, TestMessage3> registry;
     registry.registerMessages(&(mockFactory.get()));
-    fakeit::Verify(Method(mockFactory, registerMessage)).Exactly(6);
+    fakeit::Verify(Method(mockFactory, registerMessage)).Exactly(3);
 
-    BOOST_CHECK_EQUAL(6, messages.size());
+    BOOST_CHECK_EQUAL(3, messages.size());
     BOOST_CHECK_EQUAL("TestMessage1", messages[0]->getType());
     BOOST_CHECK_EQUAL("TestMessage2", messages[1]->getType());
     BOOST_CHECK_EQUAL("TestMessage3", messages[2]->getType());
-    BOOST_CHECK_EQUAL("HandshakeInitMessage", messages[3]->getType());
-    BOOST_CHECK_EQUAL("HandshakeResponseMessageV1", messages[4]->getType());
-    BOOST_CHECK_EQUAL("HandshakeCompleteMessage", messages[5]->getType());
-
-    BOOST_CHECK_EQUAL(6, factories.size());
+    BOOST_CHECK_EQUAL(3, factories.size());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

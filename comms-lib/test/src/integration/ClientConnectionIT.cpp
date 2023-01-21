@@ -43,7 +43,8 @@ namespace ClientConnectionIT {
     void performTest(int portNum) {
         cadf::comms::NetworkInfo netInfo = ClientConnectionIT::serverInfo(portNum);
 
-        test::TestServer<PROTOCOL> server(netInfo);
+        cadf::comms::MessageFactory<PROTOCOL> msgFactory(256);
+        test::TestServer<PROTOCOL> server(&msgFactory, netInfo);
         // Start the server
         BOOST_CHECK(!server.isUp());
         BOOST_CHECK(server.start());

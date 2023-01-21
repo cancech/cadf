@@ -9,9 +9,9 @@
 #include "comms/network/Buffer.h"
 #include "comms/network/socket/ISocketMessageReceivedListener.h"
 #include "comms/network/socket/SocketException.h"
-#include "comms/network/handshake/HandshakeInitMessage.h"
-#include "comms/network/handshake/HandshakeResponseMessage.h"
-#include "comms/network/handshake/HandshakeCompleteMessage.h"
+#include "comms/network/handshake/message/HandshakeInitMessage.h"
+#include "comms/network/handshake/message/HandshakeResponseMessage.h"
+#include "comms/network/handshake/message/HandshakeCompleteMessage.h"
 
 namespace cadf::comms {
 
@@ -34,6 +34,9 @@ namespace cadf::comms {
              * @param *client IClient throw which to communicate with the bus over the network
              */
             ClientConnection(int type, int instance, MessageFactory<PROTOCOL> *factory, IClient *client) : AbstractConnection(type, instance, factory), m_msgFactory(factory), m_client(client) {
+                MessageRegistry<PROTOCOL, HandshakeInitMessage, HandshakeResponseMessageV1, HandshakeCompleteMessage> msgRegistry;
+                msgRegistry.registerMessages(m_msgFactory);
+
                 client->setListener(this);
             }
 

@@ -25,6 +25,7 @@ namespace ClientConnectionTest {
                 fakeit::When(Method(mockClient, disconnect)).AlwaysReturn(true);
                 fakeit::Fake(Method(mockClient, send));
                 fakeit::Fake(Method(mockListener, messageReceived));
+                fakeit::Fake(Method(mockFactory, registerMessage));
 
                 fakeit::When(Method(mockFactory, serializeMessage)).AlwaysDo([&](const cadf::comms::MessagePacket &packet) {
                     lastUsedOutBuffer = new cadf::comms::OutputBuffer(1);
@@ -60,6 +61,7 @@ namespace ClientConnectionTest {
                 BOOST_CHECK_EQUAL(183, conn.getInstance());
 
                 // Verify the initialization of the class to be tested
+                fakeit::Verify(Method(mockFactory, registerMessage)).Exactly(3);
                 fakeit::Verify(Method(mockClient, setListener).Using(&conn)).Once();
                 verifyAllMocksChecked();
 

@@ -23,15 +23,14 @@ namespace cadf::comms {
             /**
              * CTOR
              *
+             * @param *handshakeHandler HandshakeHandler for handshaking with new connections that are made
+             * @param *bus IBus which is handle the routing of messages
              * @param &info const NetworkInfo providing the details of where the server should listen for client connections
              * @param maxDataMsgSize size_t the maximum size for a message to support
-             * @param maxHandshakeMsgSize size_t the maximum size to use for messages employed during handshaking (defaults to 256)
              */
-            BasicNodeBusServer(IBus *bus, const NetworkInfo &info, size_t maxDataMsgSize, size_t maxHandshakeMsgSize = 256) :
+            BasicNodeBusServer(HandshakeHandler *handshakeHandler, IBus *bus, const NetworkInfo &info, size_t maxDataMsgSize) :
                     m_msgFactory(maxDataMsgSize), m_connectionFactory(&m_msgFactory),
-                    m_handshakeFactory(maxHandshakeMsgSize, &m_msgFactory),
-                    m_handshakeHandler(&m_handshakeFactory),
-                    m_serverConnHandler(&m_handshakeHandler, &m_connectionFactory),
+                    m_serverConnHandler(handshakeHandler, &m_connectionFactory),
                     m_serverSocket(info, &m_serverConnHandler, 10), m_bus(bus), m_serverBus(&m_serverSocket, m_bus) {
                 // Register the message specified via the template
                 MessageRegistry<PROTOCOL, SUPPORTED_MESSAGES...> msgRegistry;
@@ -88,10 +87,6 @@ namespace cadf::comms {
 
             // Creates internal connections for clients when they connect
             BasicServerConnectionFactory<PROTOCOL> m_connectionFactory;
-            // Creates the handshake mechanism for a connected client
-            ProtocolHandshakeFactory<PROTOCOL> m_handshakeFactory;
-            // Performs the handshake for each new client
-            HandshakeHandler m_handshakeHandler;
             // Handles the client connections to the server
             ServerConnectionHandler m_serverConnHandler;
             // The socket on which to listen for new clients

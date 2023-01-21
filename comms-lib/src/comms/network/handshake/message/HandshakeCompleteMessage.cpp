@@ -1,4 +1,4 @@
-#include "comms/network/handshake/HandshakeCompleteMessage.h"
+#include "comms/network/handshake/message/HandshakeCompleteMessage.h"
 
 #include "comms/network/serializer/dom/BaseSerializer.h"
 #include "comms/network/serializer/binary/Serializer.h"

@@ -7,10 +7,11 @@
 #include "comms/network/handshake/HandshakeHandler.h"
 #include "comms/Constants.h"
 #include "comms/message/MessageFactory.h"
+#include "comms/message/MessageRegistry.h"
 #include "comms/message/MessagePacket.h"
-#include "comms/network/handshake/HandshakeInitMessage.h"
-#include "comms/network/handshake/HandshakeResponseMessage.h"
-#include "comms/network/handshake/HandshakeCompleteMessage.h"
+#include "comms/network/handshake/message/HandshakeInitMessage.h"
+#include "comms/network/handshake/message/HandshakeResponseMessage.h"
+#include "comms/network/handshake/message/HandshakeCompleteMessage.h"
 
 namespace cadf::comms {
     /**
@@ -115,6 +116,8 @@ namespace cadf::comms {
              * CTOR
              */
             ProtocolHandshakeFactory(size_t maxMsgSize, MessageFactory<PROTOCOL> *msgFactory) : m_maxMsgSize(maxMsgSize), m_msgFactory(msgFactory) {
+                MessageRegistry<PROTOCOL, HandshakeInitMessage, HandshakeResponseMessageV1, HandshakeCompleteMessage> msgRegistry;
+                msgRegistry.registerMessages(m_msgFactory);
             }
 
             /**

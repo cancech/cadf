@@ -2,9 +2,6 @@
 #define CAMB_MESSAGE_MESSAGEREGISTRY_H_
 
 #include "comms/message/MessageFactory.h"
-#include "comms/network/handshake/HandshakeInitMessage.h"
-#include "comms/network/handshake/HandshakeResponseMessage.h"
-#include "comms/network/handshake/HandshakeCompleteMessage.h"
 
 namespace cadf::comms {
 
@@ -58,9 +55,6 @@ namespace cadf::comms {
              */
             template<int = 0>
             void registerAllMessages(MessageFactory<PROTOCOL> *factory) {
-                registerMessage<HandshakeInitMessage>(factory);
-                registerMessage<HandshakeResponseMessageV1>(factory);
-                registerMessage<HandshakeCompleteMessage>(factory);
             }
 
             /**
